@@ -9,8 +9,13 @@ class Post extends Model {
             description: DataTypes.TEXT,
             link: DataTypes.TEXT,
             likes: DataTypes.INTEGER,
+            photo_2: DataTypes.STRING,
+            photo_3: DataTypes.STRING,
         }, {
-            sequelize
+            sequelize,
+            timestamps: true,
+            created_at: 'created_at',
+            updated_at: 'updated_at',
         })
     }
 
@@ -20,6 +25,9 @@ class Post extends Model {
 
         //Associação: users que curtiram o post;
         this.belongsToMany(models.User, { foreignKey: 'post_id', through: 'post_like', as: 'users' });
+
+        //Associação: comentários do post
+        this.hasMany(models.Comment, { foreignKey: 'post_id', as: 'comments' })
     }
 }
 
