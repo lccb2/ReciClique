@@ -25,19 +25,35 @@ export const SideContainer = styled.aside`
     position: relative;
     z-index: 1;
     padding: 1rem;
+
     h4 {
       margin-bottom: 1rem;
       font-size: 0.95rem;
       letter-spacing: 0.5px;
     }
+
     ul {
       list-style: none;
       padding: 0;
       margin: 0;
+
       li {
         margin: 0.8rem 0;
         cursor: pointer;
         font-size: 0.9rem;
+        padding: 0.3rem 0.75rem; 
+        border-radius: 5px;
+        transition: background-color 0.3s;
+
+        &:hover {
+          background-color: #73513C; 
+        }
+      }
+
+      
+      li.selected {
+        background-color: #4C3127; 
+        color: #fff;
       }
     }
   }
@@ -46,6 +62,7 @@ export const SideContainer = styled.aside`
     position: relative;
     z-index: 1;
     padding: 1rem;
+
     .user-info {
       display: flex;
       align-items: center;
@@ -54,9 +71,11 @@ export const SideContainer = styled.aside`
       color: #000;
       border-radius: 8px;
       padding: 0.5rem;
+
       img {
         border-radius: 50%;
       }
+
       div {
         p {
           margin: 0;

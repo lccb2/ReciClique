@@ -1,25 +1,24 @@
-import { useState } from 'react';
-import {
-  SideContainer,
-} from './style';
 import { useRouter } from 'next/router';
-import { ProfileIcon } from '../../assets';
+import { SideContainer } from './style';
 import Image from 'next/image';
+import { ProfileIcon } from '../../assets';
 
 export default function SideBar() {
   const router = useRouter();
+  const currentPath = router.pathname; 
 
   const backToLogin = () => {
-      router.push('/login');    
+    router.push('/login');
   };
+
   return (
     <SideContainer>
       <div className="menu">
         <h4>Abas de Navegação</h4>
         <ul>
-          <li>📋 Tela Inicial</li>
-          <li>🖼 Minha Galeria</li>
-          <li>❓ Dúvidas</li>
+          <li className={currentPath === '/' ? 'selected' : ''} onClick={() => router.push('/')}>📋 Tela Inicial</li>
+          <li className={currentPath === '/minhagaleria' ? 'selected' : ''} onClick={() => router.push('/minhagaleria')}>🖼 Minha Galeria</li>
+          <li className={currentPath === '/duvidas' ? 'selected' : ''} onClick={() => router.push('/duvidas')}>❓ Dúvidas</li>
         </ul>
       </div>
 
@@ -31,7 +30,7 @@ export default function SideBar() {
             <span>cainho@gmail.com</span>
           </div>
         </div>
-        <button className="logout"  onClick={backToLogin} >⏏️ Sair</button>
+        <button className="logout" onClick={backToLogin}>⏏️ Sair</button>
       </div>
     </SideContainer>
   );
