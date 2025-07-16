@@ -4,13 +4,11 @@ import { ModalOverlay, ModalBox, Title, Text, ButtonRow, CancelButton, DeleteBut
 
 
 
-type Props = {
+interface Props {
   isOpen: boolean;
-  onClose: () => void;
-  onEdit: () => void;
-  onDelete: () => void
   onCancel: () => void;
-};
+  onDelete: () => void;
+}
 
 
 

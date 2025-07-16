@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Container, Option } from './style';
 import DeletePostModal from '../DeletePostModal';
 import EditPostModal from '../EditPostModal';
+
 interface Props {
   isOpen: boolean;
   onClose: () => void;
@@ -20,6 +21,8 @@ const OptionsModal: React.FC<Props> = ({ isOpen, onClose }) => {
           <Option
             onClick={(e) => {
               e.stopPropagation();
+              setShowEditModal(true);
+              onClose();
             }}
           >
             Editar post
@@ -36,28 +39,19 @@ const OptionsModal: React.FC<Props> = ({ isOpen, onClose }) => {
         </Container>
       )}
 
-
       <DeletePostModal
         isOpen={showDeleteModal}
         onCancel={() => setShowDeleteModal(false)}
         onDelete={() => {
-
           alert('Post deletado!');
           setShowDeleteModal(false);
-        } } onClose={function (): void {
-          throw new Error('Function not implemented.');
-        } } onEdit={function (): void {
-          throw new Error('Function not implemented.');
-        } }      />
-
+        }}
+      />
 
       <EditPostModal
         isOpen={showEditModal}
-        onClose={() => setShowEditModal(false)} onSubmit={function (titulo: string, descricao: string, materiais: string, tutorial?: string): void {
-          throw new Error('Function not implemented.');
-        } } onEdit={function (): void {
-          throw new Error('Function not implemented.');
-        } }      />
+        onClose={() => setShowEditModal(false)}
+      />
     </>
   );
 };

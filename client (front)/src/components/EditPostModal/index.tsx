@@ -22,13 +22,9 @@ import ConfirmPost from '../ConfirmPostModal';
 interface Props {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (
-    titulo: string,
-    descricao: string,
-    materiais: string,
-    tutorial?: string
-  ) => void;
+  onSubmit?: (titulo: string, descricao: string, materiais: string, tutorial?: string) => void;
 }
+
 
 const EditPostModal: React.FC<Props> = ({ isOpen, onClose }) => {
   const [titulo, setTitulo] = useState('');
