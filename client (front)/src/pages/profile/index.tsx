@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { Container, MainContent, Header, Form, Row, Title, Divisor, Description } from './style';
 import { SideBar } from '../../components';
 import { CoverBg, ProfileIcon, Logo } from '../../assets';
+import DeleteAccountModal from '../../components/DeleteAccountModal';
 
 export default function Profile() {
   // estados para controlar os campos do form
@@ -12,8 +13,23 @@ export default function Profile() {
   const [instagram, setInstagram] = useState('');
   const [greeting, setGreeting] = useState('');
 
+  // estado para controlar o modal
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
+  // abrir modal
+  const openDeleteModal = () => setIsDeleteModalOpen(true);
+
+  // fechar modal
+  const closeDeleteModal = () => setIsDeleteModalOpen(false);
+
+  // confirmar exclusão
+  const handleConfirmDelete = () => {
+    setIsDeleteModalOpen(false);
+    alert('Conta apagada!'); // Coloque aqui a lógica real para apagar a conta
+  };
+
   // salvar os dados no localStorage
-  const handleSave = (e: { preventDefault: () => void; }) => {
+  const handleSave = (e: { preventDefault: () => void }) => {
     e.preventDefault(); // evitar reload da página
     const profileData = { username, email, phone, instagram, greeting };
     localStorage.setItem('profileData', JSON.stringify(profileData));
@@ -95,10 +111,23 @@ export default function Profile() {
             onChange={(e) => setGreeting(e.target.value)}
           />
           <div className="actions">
-            <button type="button" className="delete">✖ Apagar Conta</button>
+            <button
+              type="button"
+              className="delete"
+              onClick={openDeleteModal} // abre modal ao clicar
+            >
+              ✖ Apagar Conta
+            </button>
             <button type="submit" className="save">✅ Salvar alterações</button>
           </div>
         </Form>
+
+        {/* Modal de confirmação para apagar conta */}
+        <DeleteAccountModal
+          isOpen={isDeleteModalOpen}
+          onCancel={closeDeleteModal}
+          onDelete={handleConfirmDelete}
+        />
       </MainContent>
     </Container>
   );

@@ -11,6 +11,10 @@ export default function SideBar() {
     router.push('/login');
   };
 
+  const goToProfile = () => {
+    router.push('/profile');
+  };
+
   return (
     <SideContainer>
       <div className="menu">
@@ -22,7 +26,7 @@ export default function SideBar() {
         </ul>
       </div>
 
-      <div className="user">
+      <div className="user" onClick={goToProfile} style={{ cursor: 'pointer' }}>
         <div className="user-info">
           <Image src={ProfileIcon} alt="User" width={40} height={40} />
           <div>

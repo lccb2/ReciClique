@@ -181,6 +181,12 @@ export const Form = styled.form`
       font-weight: 400;
       line-height: 1.71875rem; 
       padding: 0.4rem 1rem;
+
+        &:hover {
+        background: #BC1111;    /* fundo vermelho */
+        color: #fff;            /* texto branco */
+        border-color: #BC1111;  /* borda vermelha */
+      }
     }
 
     .save {

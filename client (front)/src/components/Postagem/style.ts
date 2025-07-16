@@ -45,7 +45,7 @@ export const HeaderRow = styled.div`
 
 export const UserInfo = styled.div`
   display: flex;
-  align-items: center;  /* muda de flex-start para center para alinhar verticalmente */
+  align-items: center;  
   gap: 1rem;
   color: #4C3127;
 `;

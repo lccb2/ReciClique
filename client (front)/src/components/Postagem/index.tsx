@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import {
   CardContainer,
   ContentWrapper,
@@ -156,7 +157,11 @@ export default function Postagem({
 
                 <CommentContent>
                   <CommentHeader>
-                    <strong>{comment.userName}</strong>
+                    <strong>
+                      <Link href={`/perfil/${userName}`} style={{ color: '#4c3127', textDecoration: 'none' }}>
+                        {userName}
+                      </Link>
+                    </strong>
                     <CommentDateTime>{comment.dateTime}</CommentDateTime>
                   </CommentHeader>
 
