@@ -1,0 +1,20 @@
+{
+  "name": "reciclique",
+  "version": "1.0.0",
+  "description": "Projeto da Disciplina de Integração e Evolução dos Sistemas de Informação da UFPE",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lccb2/ReciClique.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lccb2/ReciClique/issues"
+  },
+  "homepage": "https://github.com/lccb2/ReciClique#readme"
+}

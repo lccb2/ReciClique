@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
 import {
   CardContainer,
   ContentWrapper,
@@ -21,16 +20,13 @@ import {
   TutorialLink,
   IconsRow,
   IconButton,
-  CommentsSection,
-  CommentItem,
-  CommentUserPhoto,
-  CommentContent,
-  CommentHeader,
-  CommentDateTime,
-  CommentText,
-  CommentActions,
   ProjectImageWrapper,
+  InteractionButton,
 } from './style';
+
+import NewPostModal from '../NewPostModal';
+import CommentViewer from '../CommentViewer';
+import { Comment } from '../../types/comment';
 
 import {
   FaHeart,
@@ -39,16 +35,6 @@ import {
   FaRegCommentDots,
   FaEllipsisV,
 } from 'react-icons/fa';
-
-interface Comment {
-  id: number;
-  userPhoto: string;
-  userName: string;
-  dateTime: string;
-  text: string;
-  liked: boolean;
-  disliked: boolean;
-}
 
 interface PostProps {
   userPhoto: string;
@@ -61,9 +47,14 @@ interface PostProps {
   projectPhoto: string;
   liked: boolean;
   disliked: boolean;
+  likes: number;
+  dislikes: number;
   comments: Comment[];
   onEdit?: () => void;
   onDelete?: () => void;
+  onLike?: () => void;
+  currentIndex: number;
+  onNavigate: (newIndex: number) => void;
 }
 
 export default function Postagem({
@@ -75,13 +66,81 @@ export default function Postagem({
   materials,
   tutorialLink,
   projectPhoto,
-  liked,
-  disliked,
-  comments,
+  liked: initialLiked,
+  disliked: initialDisliked,
+  likes: initialLikes,
+  dislikes: initialDislikes,
+  comments: initialComments,
   onEdit,
   onDelete,
 }: PostProps) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [liked, setLiked] = useState(initialLiked);
+  const [disliked, setDisliked] = useState(initialDisliked);
+  const [likes, setLikes] = useState(initialLikes);
+  const [dislikes, setDislikes] = useState(initialDislikes);
+  const [comments, setComments] = useState(initialComments);
+  const [showCommentModal, setShowCommentModal] = useState(false);
+  const [currentCommentIndex, setCurrentCommentIndex] = useState(0);
+
+
+  const handleLikePost = () => {
+    if (liked) {
+      setLiked(false);
+      setLikes((prev) => Math.max(prev - 1, 0));
+    } else {
+      setLiked(true);
+      setLikes((prev) => prev + 1);
+      if (disliked) {
+        setDisliked(false);
+        setDislikes((prev) => Math.max(prev - 1, 0));
+      }
+    }
+  };
+
+  const handleDislikePost = () => {
+    if (disliked) {
+      setDisliked(false);
+      setDislikes((prev) => Math.max(prev - 1, 0));
+    } else {
+      setDisliked(true);
+      setDislikes((prev) => prev + 1);
+      if (liked) {
+        setLiked(false);
+        setLikes((prev) => Math.max(prev - 1, 0));
+      }
+    }
+  };
+
+  const handleCommentLike = (id: number) => {
+    const updated = comments.map((comment) =>
+      comment.id === id
+        ? {
+            ...comment,
+            liked: !comment.liked,
+            disliked: comment.liked ? comment.disliked : false,
+          }
+        : comment
+    );
+    setComments(updated);
+  };
+
+  const handleCommentDislike = (id: number) => {
+    const updated = comments.map((comment) =>
+      comment.id === id
+        ? {
+            ...comment,
+            disliked: !comment.disliked,
+            liked: comment.disliked ? comment.liked : false,
+          }
+        : comment
+    );
+    setComments(updated);
+  };
+
+  const handleAddComment = (newComment: Comment) => {
+    setComments((prev) => [...prev, newComment]);
+  };
 
   return (
     <CardContainer>
@@ -123,13 +182,17 @@ export default function Postagem({
           </TutorialLink>
 
           <IconsRow>
-            <IconButton title="Curtir">
-              {liked ? <FaHeart color="red" /> : <FaRegHeart />}
-            </IconButton>
-            <IconButton title="Não Curtir" style={{ marginLeft: 12 }}>
+            <InteractionButton onClick={handleLikePost} active={liked}>
+              {liked ? <FaHeart /> : <FaRegHeart />}
+              <span>{likes}</span>
+            </InteractionButton>
+
+            <InteractionButton onClick={handleDislikePost} active={disliked}>
               <FaThumbsDown />
-            </IconButton>
-            <IconButton title="Comentários" style={{ marginLeft: 12 }}>
+              <span>{dislikes}</span>
+            </InteractionButton>
+
+            <IconButton title="Comentários" onClick={() => setShowCommentModal(true)}>
               <FaRegCommentDots />
             </IconButton>
           </IconsRow>
@@ -147,39 +210,35 @@ export default function Postagem({
         </RightContent>
       </ContentWrapper>
 
-      {Array.isArray(comments) && comments.length > 0 && (
-        <CommentsSection>
-          {comments.map((comment) => (
-            <CommentItem key={comment.id}>
-                <CommentUserPhoto>
-                  <Image src={comment.userPhoto} alt={comment.userName} width={40} height={40} />
-                </CommentUserPhoto>
+      {comments.length > 0 && (
+        <CommentViewer
+          comments={comments}
+          onLike={handleCommentLike}
+          onDislike={handleCommentDislike}
+          currentIndex={currentCommentIndex}
+          onNavigate={setCurrentCommentIndex}
+        />
 
-                <CommentContent>
-                  <CommentHeader>
-                    <strong>
-                      <Link href={`/perfil/${userName}`} style={{ color: '#4c3127', textDecoration: 'none' }}>
-                        {userName}
-                      </Link>
-                    </strong>
-                    <CommentDateTime>{comment.dateTime}</CommentDateTime>
-                  </CommentHeader>
+      )}
 
-                  <CommentText>{comment.text}</CommentText>
-
-                  <CommentActions>
-                    <IconButton title="Curtir">
-                      {comment.liked ? <FaHeart color="red" /> : <FaRegHeart />}
-                    </IconButton>
-                    <IconButton title="Não Curtir" style={{ marginLeft: 10 }}>
-                      <FaThumbsDown />
-                    </IconButton>
-                  </CommentActions>
-                </CommentContent>
-              </CommentItem>
-
-          ))}
-        </CommentsSection>
+      {showCommentModal && (
+        <NewPostModal
+          onClose={() => setShowCommentModal(false)}
+          onSubmit={(titulo: string, descricao: string, materiais: string, tutorial?: string) => {
+            const newComment: Comment = {
+              id: Date.now(),
+              userPhoto: userPhoto,
+              userName: userName,
+              dateTime: new Date().toLocaleString(),
+              text: descricao,
+              liked: false,
+              disliked: false,
+              likes: 0,
+              dislikes: 0,
+            };
+            handleAddComment(newComment);
+            setShowCommentModal(false);
+          } } isOpen={false}        />
       )}
     </CardContainer>
   );

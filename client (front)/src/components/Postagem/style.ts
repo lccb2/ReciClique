@@ -3,7 +3,7 @@ import styled from 'styled-components';
 export const CardContainer = styled.div`
   width: 95%;
   background: #FFFCF8;
-  border: 0.75px solid #e3d7c7; 
+  border: 2px solid #e3d7c7; 
   border-radius: 12px;
   margin: 1.5rem auto 2rem auto;
   padding: 1.5rem 2rem;
@@ -258,5 +258,30 @@ export const DropdownMenu = styled.div`
     &:hover {
       background-color: #f2f2f2;
     }
+  }
+`;
+
+export const InteractionButton = styled.button<{ active?: boolean }>`
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+
+  svg {
+    font-size: 16px;
+    color: ${({ active }) => (active ? '#c04f4f' : '#666')};
+    transition: color 0.2s;
+  }
+
+  span {
+    font-size: 13px;
+    color: #333;
+  }
+
+  &:hover svg {
+    color: #c04f4f;
   }
 `;
