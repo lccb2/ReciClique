@@ -8,6 +8,7 @@ interface Props {
   isOpen: boolean;
   onCancel: () => void;
   onDelete: () => void;
+  onClose: () => void;
 }
 
 

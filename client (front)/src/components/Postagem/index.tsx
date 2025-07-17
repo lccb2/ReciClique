@@ -24,16 +24,16 @@ import {
   InteractionButton,
 } from './style';
 
-import NewPostModal from '../NewPostModal';
+import NewCommentModal from '../NewCommentModal';
 import CommentViewer from '../CommentViewer';
 import { Comment } from '../../types/comment';
+import OptionsModal from '../OptionsModal';
 
 import {
   FaHeart,
   FaRegHeart,
   FaThumbsDown,
   FaRegCommentDots,
-  FaEllipsisV,
 } from 'react-icons/fa';
 
 interface PostProps {
@@ -50,11 +50,11 @@ interface PostProps {
   likes: number;
   dislikes: number;
   comments: Comment[];
-  onEdit?: () => void;
   onDelete?: () => void;
   onLike?: () => void;
   currentIndex: number;
   onNavigate: (newIndex: number) => void;
+  onEdit?: () => void;
 }
 
 export default function Postagem({
@@ -79,10 +79,17 @@ export default function Postagem({
   const [disliked, setDisliked] = useState(initialDisliked);
   const [likes, setLikes] = useState(initialLikes);
   const [dislikes, setDislikes] = useState(initialDislikes);
-  const [comments, setComments] = useState(initialComments);
-  const [showCommentModal, setShowCommentModal] = useState(false);
   const [currentCommentIndex, setCurrentCommentIndex] = useState(0);
-
+  const [showCommentModal, setShowCommentModal] = useState(false);
+  const [comments, setComments] = useState<Comment[]>(
+    initialComments.map((c) => ({
+      ...c,
+      likes: c.likes ?? 0,
+      dislikes: c.dislikes ?? 0,
+      liked: c.liked ?? false,
+      disliked: c.disliked ?? false,
+    }))
+  );
 
   const handleLikePost = () => {
     if (liked) {
@@ -113,33 +120,52 @@ export default function Postagem({
   };
 
   const handleCommentLike = (id: number) => {
-    const updated = comments.map((comment) =>
-      comment.id === id
-        ? {
-            ...comment,
-            liked: !comment.liked,
-            disliked: comment.liked ? comment.disliked : false,
-          }
-        : comment
+    setComments((prev) =>
+      prev.map((c) => {
+        if (c.id === id) {
+          const isLiked = !c.liked;
+          return {
+            ...c,
+            liked: isLiked,
+            disliked: isLiked ? false : c.disliked,
+            likes: isLiked ? (c.likes ?? 0) + 1 : Math.max((c.likes ?? 1) - 1, 0),
+            dislikes: isLiked && c.disliked ? Math.max((c.dislikes ?? 1) - 1, 0) : c.dislikes,
+          };
+        }
+        return c;
+      })
     );
-    setComments(updated);
   };
 
   const handleCommentDislike = (id: number) => {
-    const updated = comments.map((comment) =>
-      comment.id === id
-        ? {
-            ...comment,
-            disliked: !comment.disliked,
-            liked: comment.disliked ? comment.liked : false,
-          }
-        : comment
+    setComments((prev) =>
+      prev.map((c) => {
+        if (c.id === id) {
+          const isDisliked = !c.disliked;
+          return {
+            ...c,
+            disliked: isDisliked,
+            liked: isDisliked ? false : c.liked,
+            dislikes: isDisliked ? (c.dislikes ?? 0) + 1 : Math.max((c.dislikes ?? 1) - 1, 0),
+            likes: isDisliked && c.liked ? Math.max((c.likes ?? 1) - 1, 0) : c.likes,
+          };
+        }
+        return c;
+      })
     );
-    setComments(updated);
   };
 
   const handleAddComment = (newComment: Comment) => {
-    setComments((prev) => [...prev, newComment]);
+    setComments((prev) => [
+      ...prev,
+      {
+        ...newComment,
+        likes: 0,
+        dislikes: 0,
+        liked: false,
+        disliked: false,
+      },
+    ]);
   };
 
   return (
@@ -159,13 +185,16 @@ export default function Postagem({
 
             <Actions>
               <ActionButton onClick={() => setMenuOpen(!menuOpen)} title="Mais opções">
-                <FaEllipsisV />
+                ⋮
               </ActionButton>
               {menuOpen && (
-                <DropdownMenu>
-                  <button onClick={onEdit}>✏️ Editar</button>
-                  <button onClick={onDelete}>🗑️ Excluir</button>
-                </DropdownMenu>
+                <OptionsModal
+                  isOpen={menuOpen}
+                  onClose={() => setMenuOpen(false)} onCancel={function (): void {
+                    throw new Error('Function not implemented.');
+                  } } onDelete={function (): void {
+                    throw new Error('Function not implemented.');
+                  } }                />
               )}
             </Actions>
           </HeaderRow>
@@ -218,13 +247,12 @@ export default function Postagem({
           currentIndex={currentCommentIndex}
           onNavigate={setCurrentCommentIndex}
         />
-
       )}
 
       {showCommentModal && (
-        <NewPostModal
+        <NewCommentModal
           onClose={() => setShowCommentModal(false)}
-          onSubmit={(titulo: string, descricao: string, materiais: string, tutorial?: string) => {
+          onSubmit={( descricao) => {
             const newComment: Comment = {
               id: Date.now(),
               userPhoto: userPhoto,
@@ -238,7 +266,9 @@ export default function Postagem({
             };
             handleAddComment(newComment);
             setShowCommentModal(false);
-          } } isOpen={false}        />
+          }}
+          isOpen={true}
+        />
       )}
     </CardContainer>
   );
