@@ -3,15 +3,13 @@ import Image from 'next/image';
 import {
   Container,
   MainContent,
-  Title,
   Divisor,
-  TopBarWrapper,
   TopBar,
 } from './style';
 
 import { SideBar } from '../../components';
 import Postagem from '../../components/Postagem';
-import { Logo } from '../../assets';
+import { Logo, ProfileIcon } from '../../assets';
 import SearchModal from '../../components/SearchModal';
 import NewPostModal from '../../components/NewPostModal';
 import { Comment } from '../../types/comment';
@@ -52,10 +50,10 @@ export default function TelaInicial() {
   const comentariosMock: Comment[] = [
     {
       id: 1,
-      userPhoto: '/user1.png',
-      userName: 'Ana Paula',
-      dateTime: '2025-07-17 15:00',
-      text: 'Muito bom esse projeto!',
+      userPhoto: "/img/ProfileIcon.png",
+      userName: 'Caio',
+      dateTime: '17/07/2025 ás 15:00',
+      text: 'Lindo Lo! Tu arrasa!',
       likes: 3,
       dislikes: 0,
       liked: false,
@@ -68,19 +66,22 @@ export default function TelaInicial() {
       <SideBar />
 
       <MainContent>
-        <Title>
-          <Image src={Logo} alt="Logo" width={39} height={43} />
-          Reciclique
-        </Title>
 
-        <TopBarWrapper>
-          <TopBar>
-            <SearchModal />
-          </TopBar>
-          <button className="nova-postagem" onClick={() => setShowPostModal(true)}>
-            + 
-          </button>
-        </TopBarWrapper>
+        <TopBar>
+            <div className="logo-wrapper">
+              <Image src={Logo} alt="logo" width={49} height={53} />
+              <span className="logo-text">ReciClique</span>
+            </div>
+            
+            <div className="search">
+              <SearchModal />
+            </div>
+
+            <button className="postagem" onClick={() => setShowPostModal(true)}>
+              + Nova Postagem
+            </button>
+        </TopBar>
+
 
         <NewPostModal
           isOpen={showPostModal}
@@ -93,13 +94,13 @@ export default function TelaInicial() {
         {/* Mock de postagem para exibição */}
         <Postagem
           userPhoto="/img/user1.jpg"
-          userName="João Recicla"
-          dateTime="2025-07-17 14:00"
-          projectTitle="Luminária de Garrafa PET"
-          projectDescription="Uma luminária feita com materiais recicláveis, ideal para quartos."
-          materials="Garrafa PET, lâmpada LED, estilete, cola quente"
-          tutorialLink="https://youtube.com/tutorial-luminaria"
-          projectPhoto={['/img/projeto.jpg', '/img/user1.jpg']}
+          userName="Lore"
+          dateTime="17/07/2025 ás 14:00"
+          projectTitle="Vaso de Garrafa PET"
+          projectDescription="Um jardim feito com materiais recicláveis, ideal para varandas."
+          materials="Garrafa PET, estilete, cola quente"
+          tutorialLink="https://www.youtube.com/watch?v=xTqb6B03TI0"
+          projectPhoto={['/img/projeto.jpg', '/img/projeto2.jpg']}
           liked={false}
           disliked={false}
           likes={15}

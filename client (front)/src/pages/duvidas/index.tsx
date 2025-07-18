@@ -47,7 +47,7 @@ export default function Duvidas() {
   };
 
   const handleFormRedirect = () => {
-    window.open('https://forms.gle/seu-formulario-aqui', '_blank');
+    window.open('https://docs.google.com/forms/d/e/1FAIpQLScq3VTBg3zMu6sffMFIoxp3mk4klvH7BMxwsU19Az6xs4ySJA/viewform', '_blank');
   };
 
 
@@ -60,10 +60,10 @@ export default function Duvidas() {
             <Image src={Logo} alt="Logo" width={49} height={53} />
             Reciclique
           </Title>
-          <button>
+          <button onClick={handleFormRedirect}>
             <FaPaperPlane style={{ marginRight: '0.5rem' }} />
             Enviar Dúvida
-        </button>
+          </button>
         </TopBar>
         <Divisor />
         <FaqBox>

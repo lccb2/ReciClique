@@ -32,68 +32,46 @@ export const Divisor = styled.div`
 `;
 
 
-export const Title = styled.h1`
-  color: #4c3127;
-  font-family: 'Amatic SC';
-  font-size: 3.62831rem;
-  font-style: normal;
-  font-weight: 500;
-  line-height: 2.4945rem;
-  margin: 2rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-
-  img {
-    display: block;
-  }
-`;
 
 export const TopBar = styled.div`
   display: flex;
   align-items: center;
-  justify-content: center; 
+  justify-content: space-between;
   gap: 2rem;
   width: 100%;
-  padding: 1rem 1rem 1rem 2rem; 
+  padding: 1rem 2rem;
   margin-bottom: 1rem;
-  position: relative;
 
-  .logo {
-    color: #4c3127;
-    font-family: 'Amatic SC';
-    font-size: 2.62831rem;
-    font-weight: 500;
-    line-height: 2.4945rem;
+  .logo-wrapper {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    white-space: nowrap;
+    gap: 0.75rem;
+  }
 
-    img {
-      display: block;
-    }
-
-    span {
-      font-size: 1.25rem;
-      font-weight: 500;
-    }
+  .logo-text {
+    color: #4c3127;
+    font-family: 'Amatic SC', cursive;
+    font-size: 3rem;
+    font-weight: 1000;
+    line-height: 1;
   }
 
   .search {
     flex: 1;
-    max-width: 450px;
+    max-width: 100px;
+    margin: 0 2rem;
     position: relative;
+    align-self: flex-start;
+
   }
 
-  .nova-postagem {
-    margin-left: auto;
+  .postagem {
     background: #A0B78A;
     color: #fff;
     border: none;
     border-radius: 0.5rem;
-    padding: 0.5rem 1.2rem;
-    font-size: 3rem;
+    padding: 1.7rem 1.2rem;
+    font-size: 1rem;
     cursor: pointer;
     font-family: 'Montserrat', sans-serif;
     white-space: nowrap;
@@ -103,15 +81,9 @@ export const TopBar = styled.div`
       background-color: #8da671;
     }
   }
-;`
-
-export const TopBarWrapper = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin: 0 2rem;
-  gap: 1rem;
 `;
+
+
 
 
 export const FiltroBtn = styled.button<{ selected?: boolean }>`

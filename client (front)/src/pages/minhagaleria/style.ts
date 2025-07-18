@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { ProfileBg } from '../../assets';
+import { ProfileBg, CoverBg } from '../../assets';
 
 export const Container = styled.div`
   display: flex;
@@ -11,87 +11,6 @@ export const Container = styled.div`
   background-repeat: no-repeat;
 `;
 
-export const SideContainer = styled.aside`
-  width: 260px;
-  background-color: #9bb58d;
-  color: #fff;
-  position: relative;
-
-  .bg {
-    position: absolute;
-    inset: 0;
-    opacity: 0.1;
-  }
-
-  .menu {
-    padding: 1rem;
-    position: relative;
-    z-index: 1;
-
-    h4 {
-      margin-bottom: 1rem;
-    }
-
-    ul {
-      list-style: none;
-      padding: 0;
-
-      li {
-        margin: 0.5rem 0;
-        cursor: pointer;
-
-        &.selected {
-          font-weight: bold;
-          text-decoration: underline;
-          background: rgba(255, 255, 255, 0.15);
-          padding: 0.2rem 0.5rem;
-          border-radius: 6px;
-        }
-      }
-    }
-  }
-
-  .profile {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    position: absolute;
-    bottom: 50px;
-    left: 10px;
-    right: 10px;
-    background: #fff;
-    color: #000;
-    border-radius: 8px;
-    padding: 0.5rem;
-
-    img {
-      border-radius: 50%;
-    }
-
-    div {
-      p {
-        margin: 0;
-        font-weight: bold;
-      }
-
-      span {
-        font-size: 0.8rem;
-      }
-    }
-  }
-
-  .logout {
-    position: absolute;
-    bottom: 10px;
-    left: 10px;
-    right: 10px;
-    background: none;
-    color: #fff;
-    border: none;
-    cursor: pointer;
-  }
-`;
-
 export const MainContent = styled.main`
   flex: 1;
   display: flex;
@@ -100,11 +19,11 @@ export const MainContent = styled.main`
   margin-right: 2.5rem;
   background: #fff;
   border-radius: 1rem;
-  max-height: calc(100vh - 5rem); // altura máxima da tela
-  overflow-y: auto; // scroll interno
+  max-height: calc(100vh - 5rem);
+  overflow-y: auto;
   padding-bottom: 2rem;
+  position: relative;
 `;
-
 
 export const Title = styled.h1`
   color: #4c3127;
@@ -117,15 +36,6 @@ export const Title = styled.h1`
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  
-`;
-
-export const Description = styled.h1`
-  color: rgba(0, 0, 0, 0.88);
-  font-family: 'Montserrat', sans-serif;
-  font-size: 0.875rem;
-  font-style: normal;
-  font-weight: 400;
 `;
 
 export const Divisor = styled.div`
@@ -137,23 +47,27 @@ export const Divisor = styled.div`
 
 export const Header = styled.div`
   position: relative;
-  height: 120px;
+  width: 100%;
+  height: 150px;
+  background-image: url(${CoverBg.src});
+  background-size: cover;
+  background-position: center;
+  border-top-left-radius: 1rem;
+  border-top-right-radius: 1rem;
 
   .profile-pic {
     position: absolute;
-    bottom: -30px;
+    bottom: -40px;
     left: 50%;
     transform: translateX(-50%);
+    width: 80px;
+    height: 80px;
     border-radius: 50%;
     overflow: hidden;
+    border: 4px solid white;
+    background-color: #fff;
+    z-index: 1;
   }
-`;
-
-export const Grid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 1.5rem;
-  padding: 2rem;
 `;
 
 export const UserInfo = styled.div`
@@ -161,7 +75,7 @@ export const UserInfo = styled.div`
   justify-content: space-between;
   align-items: flex-start;
   flex-wrap: wrap;
-  margin: 1.5rem 2rem 1.5rem 2rem; 
+  margin: 1.5rem 2rem;
   font-family: 'Montserrat', sans-serif;
 
   .left {
@@ -179,29 +93,27 @@ export const UserInfo = styled.div`
 
   .username {
     font-size: 1.25rem;
-    font-weight: 500;
-    color: #4c3127;
     font-weight: bold;
+    color: #4c3127;
   }
 
   .email {
     font-size: 0.8rem;
-    font-weight: 400;
     color: #333;
   }
 
   .other {
     font-size: 0.95rem;
-    font-weight: 400;
-    color: #333
+    color: #333;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
   }
 
   .greeting {
     width: 100%;
     margin-top: 1rem;
     font-size: 1rem;
-    font-style: normal;
-    font-weight: 400;
     color: #333;
     text-align: left;
   }

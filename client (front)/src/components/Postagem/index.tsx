@@ -54,7 +54,7 @@ interface PostProps {
   disliked: boolean;
   likes: number;
   dislikes: number;
-  comments: Comment[];
+  comments?: Comment[]; // Tornou opcional
   onDelete?: () => void;
   onLike?: () => void;
   currentIndex: number;
@@ -73,9 +73,9 @@ export default function Postagem({
   projectPhoto,
   liked: initialLiked,
   disliked: initialDisliked,
-  likes: initialLikes,
-  dislikes: initialDislikes,
-  comments: initialComments,
+  likes: initialLikes = 0,
+  dislikes: initialDislikes = 0,
+  comments: initialComments = [], // Valor padrão
   onEdit,
   onDelete,
 }: PostProps) {
@@ -85,12 +85,12 @@ export default function Postagem({
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [liked, setLiked] = useState(initialLiked);
   const [disliked, setDisliked] = useState(initialDisliked);
-  const [likes, setLikes] = useState(initialLikes);
-  const [dislikes, setDislikes] = useState(initialDislikes);
+  const [likes, setLikes] = useState(initialLikes ?? 0);
+  const [dislikes, setDislikes] = useState(initialDislikes ?? 0);
   const [currentCommentIndex, setCurrentCommentIndex] = useState(0);
   const [showCommentModal, setShowCommentModal] = useState(false);
   const [comments, setComments] = useState<Comment[]>(
-    initialComments.map((c) => ({
+    (initialComments ?? []).map((c) => ({
       ...c,
       likes: c.likes ?? 0,
       dislikes: c.dislikes ?? 0,
