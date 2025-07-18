@@ -20,7 +20,7 @@ export default function SideBar() {
       <div className="menu">
         <h4>Abas de Navegação</h4>
         <ul>
-          <li className={currentPath === '/' ? 'selected' : ''} onClick={() => router.push('/')}>📋 Tela Inicial</li>
+          <li className={currentPath === '/inicio' ? 'selected' : ''} onClick={() => router.push('/inicio')}>📋 Tela Inicial</li>
           <li className={currentPath === '/minhagaleria' ? 'selected' : ''} onClick={() => router.push('/minhagaleria')}>🖼 Minha Galeria</li>
           <li className={currentPath === '/duvidas' ? 'selected' : ''} onClick={() => router.push('/duvidas')}>❓ Dúvidas</li>
         </ul>

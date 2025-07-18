@@ -30,11 +30,14 @@ export const RightContent = styled.div`
   min-height: 200px;
 `;
 
+
+
 export const ProjectImageWrapper = styled.div`
-  position: relative;
+  display: flex;
+  gap: 0.5rem;
   width: 100%;
-  height: 100%;
 `;
+
 
 export const HeaderRow = styled.div`
   display: flex;
@@ -158,7 +161,44 @@ export const IconButton = styled.button`
   }
 `;
 
-/* Comentários */
+
+export const InteractionButton = styled.button`
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 1.4rem;
+`
+export const ProjectImage = styled.div`
+  position: relative;
+  flex: 1;
+  aspect-ratio: 1.2;
+  min-height: 210px;
+  max-height: 210px;
+  width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+`;
+
+
+export const CarouselArrow = styled.button`
+  background: rgba(255, 255, 255, 0.7);
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  color: #4C3127;
+  z-index: 2;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  align-self: center;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.9);
+    color: #8B5E3C;
+  }
+`;
+
+
+/* Comentarios */
 
 export const CommentsSection = styled.div`
   width: 90%;
@@ -233,55 +273,3 @@ export const CommentText = styled.p`
   align-items: flex-start;
 `;
 
-export const DropdownMenu = styled.div`
-  position: absolute;
-  top: 30px;
-  right: 0;
-  background: #fff;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  z-index: 10;
-  display: flex;
-  flex-direction: column;
-
-  button {
-    background: none;
-    border: none;
-    padding: 0.5rem 1rem;
-    text-align: left;
-    cursor: pointer;
-    color: #4c3127;
-    font-size: 0.9rem;
-    white-space: nowrap;
-
-    &:hover {
-      background-color: #f2f2f2;
-    }
-  }
-`;
-
-export const InteractionButton = styled.button<{ active?: boolean }>`
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  background: none;
-  border: none;
-  padding: 4px;
-  cursor: pointer;
-
-  svg {
-    font-size: 16px;
-    color: ${({ active }) => (active ? '#c04f4f' : '#666')};
-    transition: color 0.2s;
-  }
-
-  span {
-    font-size: 13px;
-    color: #333;
-  }
-
-  &:hover svg {
-    color: #c04f4f;
-  }
-`;

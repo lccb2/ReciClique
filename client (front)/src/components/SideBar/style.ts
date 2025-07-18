@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 
 export const SideContainer = styled.aside`
-  width: 260px;
+  width: 220px;
   background-color: #9bb58d;
   color: #fff;
   position: relative;
@@ -83,7 +83,7 @@ export const SideContainer = styled.aside`
           font-weight: bold;
         }
         span {
-          font-size: 0.75rem;
+          font-size: 0.55rem;
         }
       }
     }

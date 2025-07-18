@@ -12,7 +12,6 @@ import {
   DateTime,
   Actions,
   ActionButton,
-  DropdownMenu,
   ProjectTitle,
   ProjectDescription,
   SectionTitle,
@@ -20,21 +19,27 @@ import {
   TutorialLink,
   IconsRow,
   IconButton,
+  ProjectImage,
   ProjectImageWrapper,
-  InteractionButton,
+  CarouselArrow
 } from './style';
 
 import NewCommentModal from '../NewCommentModal';
 import CommentViewer from '../CommentViewer';
 import { Comment } from '../../types/comment';
 import OptionsModal from '../OptionsModal';
+import DeletePostModal from '../DeletePostModal';
+import EditPostModal from '../EditPostModal';
 
 import {
   FaHeart,
   FaRegHeart,
   FaThumbsDown,
   FaRegCommentDots,
+  FaChevronLeft,
+  FaChevronRight,
 } from 'react-icons/fa';
+import { InteractionButton } from 'components/CommentViewer/style';
 
 interface PostProps {
   userPhoto: string;
@@ -44,7 +49,7 @@ interface PostProps {
   projectDescription: string;
   materials: string;
   tutorialLink: string;
-  projectPhoto: string;
+  projectPhoto: string | string[];
   liked: boolean;
   disliked: boolean;
   likes: number;
@@ -75,6 +80,9 @@ export default function Postagem({
   onDelete,
 }: PostProps) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [liked, setLiked] = useState(initialLiked);
   const [disliked, setDisliked] = useState(initialDisliked);
   const [likes, setLikes] = useState(initialLikes);
@@ -168,6 +176,16 @@ export default function Postagem({
     ]);
   };
 
+  const photos = Array.isArray(projectPhoto) ? projectPhoto : [projectPhoto];
+
+  const handlePrevImage = () => {
+    setCurrentImageIndex((prev) => (prev - 1 + photos.length) % photos.length);
+  };
+
+  const handleNextImage = () => {
+    setCurrentImageIndex((prev) => (prev + 1) % photos.length);
+  };
+
   return (
     <CardContainer>
       <ContentWrapper>
@@ -190,11 +208,10 @@ export default function Postagem({
               {menuOpen && (
                 <OptionsModal
                   isOpen={menuOpen}
-                  onClose={() => setMenuOpen(false)} onCancel={function (): void {
-                    throw new Error('Function not implemented.');
-                  } } onDelete={function (): void {
-                    throw new Error('Function not implemented.');
-                  } }                />
+                  onClose={() => setMenuOpen(false)}
+                  onEdit={() => setShowEditModal(true)}
+                  onDelete={() => setShowDeleteModal(true)}
+                />
               )}
             </Actions>
           </HeaderRow>
@@ -229,12 +246,16 @@ export default function Postagem({
 
         <RightContent>
           <ProjectImageWrapper>
-            <Image
-              src={projectPhoto}
-              alt={projectTitle}
-              fill
-              style={{ objectFit: 'cover' }}
-            />
+            <CarouselArrow onClick={handlePrevImage}><FaChevronLeft /></CarouselArrow>
+            <ProjectImage>
+              <Image
+                src={photos[currentImageIndex]}
+                alt={`${projectTitle} - imagem ${currentImageIndex + 1}`}
+                fill
+                style={{ objectFit: 'cover' }}
+              />
+            </ProjectImage>
+            <CarouselArrow onClick={handleNextImage}><FaChevronRight /></CarouselArrow>
           </ProjectImageWrapper>
         </RightContent>
       </ContentWrapper>
@@ -252,11 +273,11 @@ export default function Postagem({
       {showCommentModal && (
         <NewCommentModal
           onClose={() => setShowCommentModal(false)}
-          onSubmit={( descricao) => {
+          onSubmit={(descricao) => {
             const newComment: Comment = {
               id: Date.now(),
-              userPhoto: userPhoto,
-              userName: userName,
+              userPhoto,
+              userName,
               dateTime: new Date().toLocaleString(),
               text: descricao,
               liked: false,
@@ -268,6 +289,25 @@ export default function Postagem({
             setShowCommentModal(false);
           }}
           isOpen={true}
+        />
+      )}
+
+      {showEditModal && (
+        <EditPostModal
+          isOpen={showEditModal}
+          onClose={() => setShowEditModal(false)}
+        />
+      )}
+
+      {showDeleteModal && (
+        <DeletePostModal
+          isOpen={showDeleteModal}
+          onClose={() => setShowDeleteModal(false)}
+          onCancel={() => setShowDeleteModal(false)}
+          onDelete={() => {
+            setShowDeleteModal(false);
+            onDelete?.();
+          }}
         />
       )}
     </CardContainer>

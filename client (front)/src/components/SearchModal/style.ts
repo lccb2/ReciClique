@@ -1,18 +1,23 @@
 import styled from 'styled-components';
 
-export const Container = styled.div`
-  max-width: 35rem;
-  min-width: 35rem;
-  min-height: 25rem;
-  margin: auto;
+export const Container = styled.div<{ isExpanded: boolean }>`
+  max-width: 20rem;
+  min-width: 20rem;
   padding: 1rem;
   font-family: 'Montserrat', sans-serif;
   background: #fff;
   border-radius: 8px;
   box-shadow: 0 0 10px #ddd;
-
   display: flex;
   flex-direction: column;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 10;
+
+  // altura dinâmica
+  min-height: ${({ isExpanded }) => (isExpanded ? '25rem' : '4.5rem')};
+  transition: min-height 0.3s ease;
 
   h4 {
     margin: 1rem 0 0.5rem;
@@ -21,7 +26,6 @@ export const Container = styled.div`
     font-weight: 400;
     line-height: 1.25rem;
     letter-spacing: 0.0625rem;
-    font-family: 'Montserrat', sans-serif;
   }
 `;
 

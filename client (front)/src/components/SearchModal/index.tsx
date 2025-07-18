@@ -1,6 +1,11 @@
 import { useState } from 'react';
 import {
-  Container, SearchInput, Suggestions, Tag, Actions, EmptyState
+  Container,
+  SearchInput,
+  Suggestions,
+  Tag,
+  Actions,
+  EmptyState
 } from './style';
 
 const allItems = [
@@ -15,6 +20,10 @@ const allItems = [
 export default function SearchModal() {
   const [query, setQuery] = useState('');
   const [selected, setSelected] = useState<string[]>([]);
+  const [isFocused, setIsFocused] = useState(false);
+
+  // define se o modal está expandido
+  const isExpanded = isFocused || selected.length > 0;
 
   const handleSelect = (item: string) => {
     if (!selected.includes(item)) {
@@ -32,13 +41,15 @@ export default function SearchModal() {
   );
 
   return (
-    <Container>
+    <Container isExpanded={isExpanded}>
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
         <SearchInput>
           <input
             type="text"
             placeholder="Pesquise por um Item"
             value={query}
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setTimeout(() => setIsFocused(false), 200)}
             onChange={e => setQuery(e.target.value)}
           />
           {query && (
@@ -46,45 +57,54 @@ export default function SearchModal() {
           )}
         </SearchInput>
 
-        {selected.length > 0 && (
-          <div>
-            <h4>Itens Selecionados</h4>
-            <Suggestions>
-              {selected.map(item => (
-                <Tag key={item} selected onClick={() => handleRemove(item)}>
-                  ✖ {item}
-                </Tag>
-              ))}
-            </Suggestions>
-          </div>
+        {isExpanded && (
+          <>
+            {selected.length > 0 && (
+              <div>
+                <h4>Itens Selecionados</h4>
+                <Suggestions>
+                  {selected.map(item => (
+                    <Tag key={item} selected onClick={() => handleRemove(item)}>
+                      ✖ {item}
+                    </Tag>
+                  ))}
+                </Suggestions>
+              </div>
+            )}
+
+            <div style={{ flex: 1 }}>
+              {query && filteredItems.length === 0 && selected.length === 0 ? (
+                <EmptyState>
+                  Não encontramos nenhum resultado para a sua busca.
+                  <br />
+                  Que tal verificar a ortografia ou tentar com outras palavras?
+                </EmptyState>
+              ) : (
+                <>
+                  {!query && <h4>Sugestão de Itens</h4>}
+                  <Suggestions>
+                    {filteredItems.map(item => (
+                      <Tag key={item} onClick={() => handleSelect(item)}>
+                        {item}
+                      </Tag>
+                    ))}
+                  </Suggestions>
+                </>
+              )}
+            </div>
+
+            <Actions>
+              <button className="back" onClick={() => {
+                setQuery('');
+                setSelected([]);
+                setIsFocused(false);
+              }}>Voltar</button>
+
+              <button className="filter">Filtrar</button>
+            </Actions>
+          </>
         )}
-
-        <div style={{ flex: 1 }}>
-          {query && filteredItems.length === 0 && selected.length === 0 ? (
-            <EmptyState>
-              Não encontramos nenhum resultado para a sua busca.
-              <br />
-              Que tal verificar a ortografia ou tentar com outras palavras?
-            </EmptyState>
-          ) : (
-            <>
-              {!query && <h4>Sugestão de Itens</h4>}
-              <Suggestions>
-                {filteredItems.map(item => (
-                  <Tag key={item} onClick={() => handleSelect(item)}>
-                    {item}
-                  </Tag>
-                ))}
-              </Suggestions>
-            </>
-          )}
-        </div>
       </div>
-
-      <Actions>
-        <button className="back">Voltar</button>
-        <button className="filter">Filtrar</button>
-      </Actions>
     </Container>
   );
 }

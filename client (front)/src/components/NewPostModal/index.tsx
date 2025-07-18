@@ -18,7 +18,7 @@ import {
 } from './style';
 import MaterialSelector from '../MaterialSelector'; 
 import ConfirmPost from '../ConfirmPostModal';
-import { Comment } from '../../types/comment';
+
 
 interface Props {
   isOpen: boolean;
