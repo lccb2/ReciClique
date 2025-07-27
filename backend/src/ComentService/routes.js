@@ -1,15 +1,16 @@
 const express = require('express');
 const ComentController = require('./ComentController');
+const loginRequired = require('../middlewares/loginRequired');
 
 const routes = express.Router();
 
 // comentários
-routes.post('/comment', ComentController.createComment);
-routes.get('/comments/:post_id', ComentController.listComments);
+routes.post('/comment', loginRequired, ComentController.createComment);
+routes.get('/comments/:post_id', loginRequired, ComentController.listComments);
 
 // curtidas
-routes.post('/like', ComentController.like);
-routes.post('/unlike', ComentController.unlike);
-routes.get('/isliked', ComentController.isLiked);
+routes.post('/like', loginRequired, ComentController.like);
+routes.post('/unlike', loginRequired, ComentController.unlike);
+routes.get('/isliked', loginRequired, ComentController.isLiked);
 
 module.exports = routes;

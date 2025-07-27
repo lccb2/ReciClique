@@ -5,13 +5,13 @@ module.exports = {
     async register(req, res){
         const { name, email, username, password } = req.body;
 
-        const hasUser = await User.findAll({
+        const hasUser = await User.findOne({
             where: {
                 username
             }
         });
 
-        if (hasUser.length) {
+        if (hasUser) {
             return res.status(403).json({
                 errors: ['Username já existe!']
             });

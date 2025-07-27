@@ -2,7 +2,10 @@ const { Model, DataTypes } = require('sequelize');
 
 class PostMaterial extends Model {
     static init(sequelize) {
-        super.init({}, {
+        super.init({
+            post_id: DataTypes.INTEGER,
+            material_id: DataTypes.INTEGER
+        }, {
             sequelize,
             tableName: 'post_materiais',
             timestamps: true,

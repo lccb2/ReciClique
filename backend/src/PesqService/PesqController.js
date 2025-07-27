@@ -4,6 +4,15 @@ const Materiais = require('../models/Materiais');
 const User = require('../models/User');
 
 module.exports = {
+    async index(req, res) {
+        try {
+            const materiais = await Materiais.findAll();
+            return res.json(materiais);
+        } catch (error) {
+            return res.status(500).json({ error: error.message });
+        }
+    },
+
     // recebe lista de material_ids e retorna posts que usam esses materiais
     async searchByMaterials(req, res) {
         try {
@@ -25,11 +34,17 @@ module.exports = {
                 where: { id: postIds },
                 include: [
                     { model: User, as: 'user', attributes: ['id', 'name'] },
-                    { model: Materiais, as: 'materiais', through: { attributes: [] } }
-                ]
+                    { 
+                        model: PostMaterial, 
+                        as: 'post_materiais', 
+                        attributes: ['id'],
+                        include: [{ model: Materiais, as: 'material', attributes: ['id', 'name'] }] 
+                    }
+                ],
             });
             return res.json(posts);
         } catch (error) {
+            console.log(error, 'error')
             return res.status(500).json({ error: 'Erro na pesquisa', details: error.message });
         }
     },
