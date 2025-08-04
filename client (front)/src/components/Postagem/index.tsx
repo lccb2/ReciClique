@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import Image, { StaticImageData } from 'next/image';
+import React, { useEffect, useMemo, useState } from "react";
+import Image, { StaticImageData } from "next/image";
 import {
   CardContainer,
   ContentWrapper,
@@ -21,17 +21,17 @@ import {
   IconButton,
   ProjectImage,
   ProjectImageWrapper,
-  CarouselArrow
-} from './style';
+  CarouselArrow,
+} from "./style";
 
-import NewCommentModal from '../NewCommentModal';
-import CommentViewer from '../CommentViewer';
-import { Comment } from '../../types/comment';
-import OptionsModal from '../OptionsModal';
-import DeletePostModal from '../DeletePostModal';
-import EditPostModal from '../EditPostModal';
-import DefaultPhoto from '../../../public/img/default.jpg';
-import { baseURL } from 'api/base';
+import NewCommentModal from "../NewCommentModal";
+import CommentViewer from "../CommentViewer";
+import { Comment } from "../../types/comment";
+import OptionsModal from "../OptionsModal";
+import DeletePostModal from "../DeletePostModal";
+import EditPostModal from "../EditPostModal";
+import DefaultPhoto from "../../../public/img/default.jpg";
+import { baseURL } from "api/base";
 
 import {
   FaHeart,
@@ -40,11 +40,16 @@ import {
   FaRegCommentDots,
   FaChevronLeft,
   FaChevronRight,
-} from 'react-icons/fa';
-import { InteractionButton } from 'components/CommentViewer/style';
-import { LineStyle } from '@mui/icons-material';
-import { createComment, getPostComments, likePost, unlikePost } from 'api/comment';
-import { getPost } from 'api/post';
+} from "react-icons/fa";
+import { InteractionButton } from "components/CommentViewer/style";
+import { LineStyle } from "@mui/icons-material";
+import {
+  createComment,
+  getPostComments,
+  likePost,
+  unlikePost,
+} from "api/comment";
+import { getPost } from "api/post";
 
 interface PostProps {
   userPhoto: any;
@@ -59,9 +64,11 @@ interface PostProps {
   disliked: boolean;
   likes: number;
   dislikes: number;
-  comments?: Comment[]; // Tornou opcional
+  comments?: Comment[];
   onDelete?: () => void;
   onLike?: () => void;
+  onLikeUpdate?: (postId: number, isLiked: boolean) => void;
+  onCommentUpdate?: (postId: number) => void;
   currentIndex: number;
   onNavigate: (newIndex: number) => void;
   onEdit?: () => void;
@@ -86,7 +93,9 @@ export default function Postagem({
   onEdit,
   onDelete,
   deletePost,
-  post
+  post,
+  onLikeUpdate,
+  onCommentUpdate,
 }: PostProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -100,24 +109,26 @@ export default function Postagem({
   const [showCommentModal, setShowCommentModal] = useState(false);
   const [comments, setComments] = useState<[]>([]);
 
-  const [userId, setUserId] = useState(Number(localStorage.getItem('user_id')));
+  const [userId, setUserId] = useState(Number(localStorage.getItem("user_id")));
 
   const [currentPost, setCurrentPost] = useState(post);
 
   const handleIsLiked = () => {
-    const userIdFromLocalStorage = Number(localStorage.getItem('user_id'));
+    const userIdFromLocalStorage = Number(localStorage.getItem("user_id"));
     setUserId(userIdFromLocalStorage);
-    const isLikedByUser = post?.post_likes?.find(like => like.user_id === userIdFromLocalStorage);
-  
+    const isLikedByUser = post?.post_likes?.find(
+      (like: any) => like.user_id === userIdFromLocalStorage
+    );
+
     setLiked(isLikedByUser);
   };
 
-  const fetchComments = async() => {
+  const fetchComments = async () => {
     try {
       const response = await getPostComments(post.id);
       setComments(response);
     } catch (error) {
-      console.log(error, 'error'); 
+      console.log(error, "error");
     }
   };
 
@@ -126,8 +137,7 @@ export default function Postagem({
     fetchComments();
   }, []);
 
-  const handleLikePost = async() => {
-    console.log(liked, 'liked')
+  const handleLikePost = async () => {
     if (liked) {
       await unlikePost(post.id);
 
@@ -137,7 +147,7 @@ export default function Postagem({
 
       setLiked(false);
 
-      window.location.reload();
+      onLikeUpdate?.(post.id, false);
     } else {
       await likePost(post.id);
 
@@ -146,7 +156,7 @@ export default function Postagem({
       setCurrentPost(updatedPost);
 
       setLiked(true);
-      window.location.reload();
+      onLikeUpdate?.(post.id, true);
     }
   };
 
@@ -202,25 +212,28 @@ export default function Postagem({
 
   const photos = useMemo(() => {
     const list = Array.isArray(projectPhoto) ? projectPhoto : [projectPhoto];
-    return list.filter((p): p is string => typeof p === 'string' && !!p);
+    return list.filter((p): p is string => typeof p === "string" && !!p);
   }, [projectPhoto]);
 
   const getProjectPhoto = (photo: string) => `${baseURL}/uploads/${photo}`;
 
   const handlePrevImage = () => {
-    setCurrentImageIndex((prev) => (prev - 1 + projectPhoto.length) % projectPhoto.length);
+    setCurrentImageIndex(
+      (prev) => (prev - 1 + projectPhoto.length) % projectPhoto.length
+    );
   };
 
   const handleNextImage = () => {
     setCurrentImageIndex((prev) => (prev + 1) % projectPhoto.length);
   };
 
-  const handleCreateComment = async(postId: number, comment: string) => {
+  const handleCreateComment = async (postId: number, comment: string) => {
     try {
       await createComment(postId, comment);
-      window.location.reload();
+      await fetchComments();
+      onCommentUpdate?.(postId);
     } catch (error) {
-      console.log(error, 'error');
+      console.log(error, "error");
     }
   };
 
@@ -233,7 +246,12 @@ export default function Postagem({
               <HeaderRow>
                 <UserInfo>
                   <UserPhoto>
-                    <Image src={userPhoto} alt={userName} width={50} height={50} />
+                    <Image
+                      src={userPhoto}
+                      alt={userName}
+                      width={50}
+                      height={50}
+                    />
                   </UserPhoto>
                   <UserNameDate>
                     <strong>{userName}</strong>
@@ -241,23 +259,24 @@ export default function Postagem({
                   </UserNameDate>
                 </UserInfo>
 
-                {
-                  currentPost.user_id === userId && (
-                    <Actions>
-                      <ActionButton onClick={() => setMenuOpen(!menuOpen)} title="Mais opções">
-                        ⋮
-                      </ActionButton>
-                      {menuOpen && (
-                        <OptionsModal
-                          isOpen={menuOpen}
-                          onClose={() => setMenuOpen(false)}
-                          onEdit={() => setShowEditModal(true)}
-                          conDelete={() => setShowDeleteModal(true)}
-                        />
-                      )}
-                    </Actions>
-                  )
-                }
+                {currentPost.user_id === userId && (
+                  <Actions>
+                    <ActionButton
+                      onClick={() => setMenuOpen(!menuOpen)}
+                      title="Mais opções"
+                    >
+                      ⋮
+                    </ActionButton>
+                    {menuOpen && (
+                      <OptionsModal
+                        isOpen={menuOpen}
+                        onClose={() => setMenuOpen(false)}
+                        onEdit={() => setShowEditModal(true)}
+                        onDelete={() => setShowDeleteModal(true)}
+                      />
+                    )}
+                  </Actions>
+                )}
               </HeaderRow>
 
               <ProjectTitle>{projectTitle}</ProjectTitle>
@@ -267,7 +286,11 @@ export default function Postagem({
               <SectionText>{materials}</SectionText>
 
               <SectionTitle>Tutorial:</SectionTitle>
-              <TutorialLink href={tutorialLink} target="_blank" rel="noopener noreferrer">
+              <TutorialLink
+                href={tutorialLink}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 Acesse o tutorial aqui
               </TutorialLink>
 
@@ -282,27 +305,37 @@ export default function Postagem({
                   <span>{dislikes}</span>
                 </InteractionButton> */}
 
-                <IconButton title="Comentários" onClick={() => setShowCommentModal(true)}>
+                <IconButton
+                  title="Comentários"
+                  onClick={() => setShowCommentModal(true)}
+                >
                   <FaRegCommentDots />
                 </IconButton>
               </IconsRow>
             </LeftContent>
 
-            
-              <RightContent>
-                <ProjectImageWrapper>
-                  <CarouselArrow onClick={handlePrevImage}><FaChevronLeft /></CarouselArrow>
-                  <ProjectImage>
-                    <Image
-                      src={(photos[currentImageIndex] ? getProjectPhoto(photos[currentImageIndex]) : DefaultPhoto)}
-                      alt={`${projectTitle} - imagem ${currentImageIndex + 1}`}
-                      fill
-                      style={{ objectFit: 'cover' }}
-                    />
-                  </ProjectImage>
-                  <CarouselArrow onClick={handleNextImage}><FaChevronRight /></CarouselArrow>
-                </ProjectImageWrapper>
-              </RightContent>
+            <RightContent>
+              <ProjectImageWrapper>
+                <CarouselArrow onClick={handlePrevImage}>
+                  <FaChevronLeft />
+                </CarouselArrow>
+                <ProjectImage>
+                  <Image
+                    src={
+                      photos[currentImageIndex]
+                        ? getProjectPhoto(photos[currentImageIndex])
+                        : DefaultPhoto
+                    }
+                    alt={`${projectTitle} - imagem ${currentImageIndex + 1}`}
+                    fill
+                    style={{ objectFit: "cover" }}
+                  />
+                </ProjectImage>
+                <CarouselArrow onClick={handleNextImage}>
+                  <FaChevronRight />
+                </CarouselArrow>
+              </ProjectImageWrapper>
+            </RightContent>
           </ContentWrapper>
 
           {comments?.length > 0 && (

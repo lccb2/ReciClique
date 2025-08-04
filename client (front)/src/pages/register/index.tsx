@@ -18,9 +18,11 @@ export const Register = ({ onBack }: { onBack: () => void }) => {
     email: '',
     phone: '',
     instagram: '',
-    mostrarTelefone: true,
-    mostrarInstagram: true,
+    show_email: true,
+    show_phone: true,
+    show_insta: true,
     photo: null as File | null,
+    greeting: ''
   });
 
   const [step, setStep] = useState<'form' | 'senha'>('form');
@@ -32,13 +34,26 @@ export const Register = ({ onBack }: { onBack: () => void }) => {
       return;
     }
 
+    if (!form.photo) {
+      alert('Por favor, selecione uma foto de perfil');
+      return;
+    }
+
     try {
-      await register({
-        ...form,
-        password
+      const response = await register({
+        name: form.name,
+        email: form.email,
+        password,
+        phone: form.phone,
+        photo: form.photo,
+        show_email: form.show_email,
+        show_phone: form.show_phone,
+        show_insta: form.show_insta
       });
-  
-      router.push('/login');
+
+      if (response.status === 200) {
+        router.push('/login');
+      }
     } catch (error) {
       console.log(error, 'error');
     }
@@ -118,6 +133,14 @@ export const Register = ({ onBack }: { onBack: () => void }) => {
           value={form.email}
           onChange={e => setForm({ ...form, email: e.target.value })}
         />
+        <CheckboxContainer>
+        <input
+          type="checkbox"
+          checked={form.show_email}
+          onChange={e => setForm({ ...form, show_email: e.target.checked })}
+        />
+        <Label>Desejo mostrar no meu perfil</Label>
+      </CheckboxContainer>
       </Field>
       <Field>
       <label><span style={{color:'red'}}>*</span> Telefone</label>
@@ -129,8 +152,8 @@ export const Register = ({ onBack }: { onBack: () => void }) => {
         <CheckboxContainer>
         <input
           type="checkbox"
-          checked={form.mostrarTelefone}
-          onChange={e => setForm({ ...form, mostrarTelefone: e.target.checked })}
+          checked={form.show_phone}
+          onChange={e => setForm({ ...form, show_phone: e.target.checked })}
         />
         <Label>Desejo mostrar no meu perfil</Label>
       </CheckboxContainer>
@@ -146,8 +169,8 @@ export const Register = ({ onBack }: { onBack: () => void }) => {
            <CheckboxContainer>
         <input
           type="checkbox"
-          checked={form.mostrarInstagram}
-          onChange={e => setForm({ ...form, mostrarInstagram: e.target.checked })}
+          checked={form.show_insta}
+          onChange={e => setForm({ ...form, show_insta: e.target.checked })}
         />
         <Label>Desejo mostrar no meu perfil</Label>
       </CheckboxContainer>

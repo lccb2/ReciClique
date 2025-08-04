@@ -26,6 +26,8 @@ export default function SideBar() {
   }, []);
 
   const backToLogin = () => {
+    localStorage.removeItem('user_id');
+    localStorage.removeItem('token');
     router.push('/login');
   };
 
@@ -46,8 +48,8 @@ export default function SideBar() {
             </ul>
           </div>
 
-          <div className="user" onClick={goToProfile} style={{ cursor: 'pointer' }}>
-            <div className="user-info">
+          <div className="user">
+            <div className="user-info" onClick={goToProfile} style={{ cursor: 'pointer' }}>
               <Image src={user.photo} alt="User" width={40} height={40} />
               <div>
                 <p style={{

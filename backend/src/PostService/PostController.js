@@ -24,9 +24,9 @@ module.exports = {
             }
 
             if (photos?.length) {
-                photo = photos[0].filename || null;
-                photo_2 = photos[1].filename || null;
-                photo_3 = photos[2].filename || null;
+                photo = photos[0]?.filename || null;
+                photo_2 = photos[1]?.filename || null;
+                photo_3 = photos[2]?.filename || null;
             }
 
             const { materiais } = req.body;
@@ -59,9 +59,9 @@ module.exports = {
 
             await PostMaterial.bulkCreate(postMateriais);
 
-            return res.json(post);   
+            return res.json(post);
         } catch (error) {
-            console.log(error)
+            throw error;
         }
     },
 

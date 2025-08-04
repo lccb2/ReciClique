@@ -35,14 +35,12 @@ module.exports = {
                     model: PostLike,
                     as: 'post_likes'
                 }],
-                logging: true,
-                nest: true 
+                nest: true
             });
-    
+
             return res.json(posts);
-            
         } catch (error) {
-            console.log(error)   
+            throw error;
         }
     },
 };

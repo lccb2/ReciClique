@@ -48,7 +48,7 @@ const MaterialSelector: React.FC<Props> = ({ selected, setSelected, materiais })
     }
   };
 
-  const filteredSuggestions = materiais.filter(item =>
+  const filteredSuggestions = materiais?.filter(item =>
     item.name.toLowerCase().includes(query.toLowerCase()) &&
     !selected.includes(item.id)
   );
@@ -80,7 +80,7 @@ const MaterialSelector: React.FC<Props> = ({ selected, setSelected, materiais })
           />
         </InputField>
 
-        {isFocused && filteredSuggestions.length > 0 && (
+        {isFocused && filteredSuggestions?.length > 0 && (
           <Suggestions>
             {filteredSuggestions.map((item) => (
               <div key={item.id} onMouseDown={() => handleSelect(item)}>

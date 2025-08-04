@@ -8,13 +8,48 @@ type EditPostData = {
     link?: string;
 }
 
+type CreatePostData = {
+    title: string;
+    description: string;
+    materiais: number[];
+    link: string;
+    photos: File[];
+}
+
+export const createPost = async(data: CreatePostData) => {
+    const formData = new FormData();
+
+    formData.append('title', data.title);
+    formData.append('description', data.description);
+
+    data.materiais.forEach(material => {
+        formData.append('materiais[]', material.toString());
+    });
+
+    formData.append('link', data.link);
+
+    data.photos?.forEach((photo: File) => {
+        formData.append('photos', photo);
+    });
+
+    try {
+        const response = await api.post('/users/posts', formData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+        });
+
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
 export const getPost = async(postId: number) => {
     try {
         const response = await api.get(`/posts/${postId}`)
 
         return response.data;
     } catch (error) {
-        console.log(error, 'error');
+        throw error;
     }
 };
 
@@ -35,7 +70,7 @@ export const editPost = async(postId: number, data: EditPostData) => {
     }
 
     data.materiais?.forEach(material => {
-        formData.append('materiais', material.toString());
+        formData.append('materiais[]', material.toString());
     });
 
     data.photos?.forEach(photo => {
@@ -49,7 +84,7 @@ export const editPost = async(postId: number, data: EditPostData) => {
 
         return response.data;
     } catch (error) {
-        console.log(error, 'error');
+        throw error;
     }
 };
 
@@ -57,7 +92,7 @@ export const deletePost = async(postId: number) => {
     try {
         await api.delete(`/posts/${postId}`);
     } catch (error) {
-        console.log(error, 'error');
+        throw error;
     }
 };
 
@@ -66,6 +101,6 @@ export const getRecentPosts = async() => {
         const response = await api.get('/posts/recent');
         return response.data;
     } catch (error) {
-        console.log(error, 'error');
+        throw error;
     }
 }

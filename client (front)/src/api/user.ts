@@ -7,6 +7,9 @@ type UpdateUserData = {
   phone?: string;
   instagram?: string;
   greeting?: string;
+  show_email?: boolean;
+  show_phone?: boolean;
+  show_insta?: boolean;
 }
 
 export const getUser = async(userId: number) => {

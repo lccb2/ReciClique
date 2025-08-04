@@ -18,22 +18,21 @@ module.exports = {
     async update(req, res){
         try {
             const { userId } = req;
-            const { name, email, username, password } = req.body;
-    
+            const { name, email, username, password, show_email, show_phone, show_insta, greeting } = req.body;
+
             const user = await User.findByPk(userId);
-    
+
             if(!user) {
                 return res.status(400).json({ error: 'Usuário não achado' });
             }
-    
-            Object.assign(user, { name, email, username, password_sent: password } );
-    
+
+            Object.assign(user, { name, email, username, password_sent: password, show_email, show_phone, show_insta, greeting });
+
             await user.save();
-    
+
             return res.json(user);
-            
         } catch (error) {
-            console.log(error, 'error')
+            throw error;
         }
     },
 

@@ -17,7 +17,9 @@ export default function Profile() {
   const [instagram, setInstagram] = useState('');
   const [greeting, setGreeting] = useState('');
   const [photo, setPhoto] = useState('');
-
+  const [showEmail, setShowEmail] = useState(false);
+  const [showPhone, setShowPhone] = useState(false);
+  const [showInsta, setShowInsta] = useState(false);
   const [user, setUser] = useState<any | null>(null);
 
   // estado para controlar o modal
@@ -33,6 +35,8 @@ export default function Profile() {
   const handleConfirmDelete = async() => {
     try {
       await deleteUser();
+      localStorage.removeItem('user_id');
+      localStorage.removeItem('token');
       router.push('/')
     } catch (error) {
       console.log(error, 'error');
@@ -40,7 +44,7 @@ export default function Profile() {
   };
 
   const fetchUser = async() => {
-    try {      
+    try {
       const userId = Number(localStorage.getItem('user_id'));
       const user = await getUser(userId);
 
@@ -50,7 +54,10 @@ export default function Profile() {
       setInstagram(user.instagram);
       setGreeting(user.greeting);
       setPhoto(user.photo);
-  
+      setShowEmail(user.show_email);
+      setShowPhone(user.show_phone);
+      setShowInsta(user.show_insta);
+
       setUser(user as any);
     } catch (error) {
       console.log(error, 'error')
@@ -61,16 +68,15 @@ export default function Profile() {
     fetchUser();
   }, []);
 
-  // salvar os dados no localStorage
   const handleSave = async(e: { preventDefault: () => void }) => {
     e.preventDefault();
 
-    try {      
-      const profileData = { name, email, phone, instagram, greeting };
-  
+    try {
+      const profileData = { name, email, phone, instagram, greeting, show_email: showEmail, show_phone: showPhone, show_insta: showInsta };
+
       await updateUser(profileData);
 
-      window.location.reload();
+      await fetchUser();
     } catch (error) {
       console.log(error, 'error');
     }
@@ -78,7 +84,7 @@ export default function Profile() {
 
   return (
     <>
-      { user && 
+      { user &&
         <Container>
           <SideBar />
           <MainContent>
@@ -114,7 +120,7 @@ export default function Profile() {
                     required
                   />
                   <div>
-                    <input type="checkbox" id="showEmail" />
+                    <input type="checkbox" id="showEmail" checked={showEmail} onChange={(e) => setShowEmail(e.target.checked)} />
                     <span>Desejo mostrar no meu perfil</span>
                   </div>
                 </label>
@@ -127,7 +133,7 @@ export default function Profile() {
                     required
                   />
                   <div>
-                    <input type="checkbox" id="showPhone" />
+                    <input type="checkbox" id="showPhone" checked={showPhone} onChange={(e) => setShowPhone(e.target.checked)} />
                     <span>Desejo mostrar no meu perfil</span>
                   </div>
                 </label>
@@ -139,7 +145,7 @@ export default function Profile() {
                     onChange={(e) => setInstagram(e.target.value)}
                   />
                   <div>
-                    <input type="checkbox" id="showInstagram" />
+                    <input type="checkbox" id="showInstagram" checked={showInsta} onChange={(e) => setShowInsta(e.target.checked)} />
                     <span>Desejo mostrar no meu perfil</span>
                   </div>
                 </label>

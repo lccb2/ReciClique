@@ -7,7 +7,10 @@ type RegisterData = {
   email: string;
   password: string;
   phone: string;
-  photo: File
+  photo: File;
+  show_email: boolean;
+  show_phone: boolean;
+  show_insta: boolean;
 }
 
 type LoginData = {
@@ -29,11 +32,10 @@ export const register = async(data: RegisterData) => {
         "Content-Type": "multipart/form-data",
       },
     });
-  
-    return response.data;
-    
+
+    return response;
   } catch (error) {
-    console.log(error, 'error')
+    throw error;
   }
 };
 
@@ -50,6 +52,6 @@ export const login = async(data: LoginData) => {
 
     return response.data;
   } catch (error) {
-    console.log(error, 'error')
+    throw error;
   }
 }

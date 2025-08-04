@@ -44,7 +44,6 @@ module.exports = {
             });
             return res.json(posts);
         } catch (error) {
-            console.log(error, 'error')
             return res.status(500).json({ error: 'Erro na pesquisa', details: error.message });
         }
     },
