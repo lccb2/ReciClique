@@ -16,9 +16,10 @@ import {
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { FaHeart, FaRegHeart, FaThumbsDown } from 'react-icons/fa';
 import { Comment } from '../../types/comment';
+import { baseURL } from 'api/base';
 
 type Props = {
-  comments: Comment[];
+  comments: any[];
   currentIndex: number;
   onNavigate: (newIndex: number) => void;
   onLike?: (id: number) => void;
@@ -41,7 +42,7 @@ export default function CommentViewer({
   return (
     <CommentBox>
       <Header>
-        <Avatar src={comment.userPhoto} alt="Avatar" />
+        <Avatar src={`${baseURL}/uploads/${comment.user.photo}`} alt="Avatar" />
         <NameDate>
           <Name>{comment.userName}</Name>
           <DateText>{comment.dateTime}</DateText>

@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors');
 require('dotenv').config();
 
 const userRoutes = require('./UserService/routes.js');
@@ -13,6 +14,9 @@ require('./database')
 const app = express();
 
 app.use(express.json());
+app.use(cors())
+app.use('/uploads', express.static('uploads'));
+
 
 app.use(userRoutes);
 app.use(publiRoutes);

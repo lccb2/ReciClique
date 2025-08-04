@@ -18,7 +18,7 @@ const DeletePostModal: React.FC<Props> = ({ isOpen, onCancel, onDelete }) => {
   return (
     <ModalOverlay onClick={onCancel}>
       <ModalBox onClick={(e) => e.stopPropagation()}>
-        <Title>Deseja excluir a postagem</Title>
+        <Title>Deseja excluir a postagem?</Title>
         <Text>
           Excluir a postagem é uma ação permanente e irreversível, resultando na perda de todos os dados preenchidos.
         </Text>

@@ -13,20 +13,48 @@ import { Logo, ProfileIcon } from '../../assets';
 import SearchModal from '../../components/SearchModal';
 import NewPostModal from '../../components/NewPostModal';
 import { Comment } from '../../types/comment';
+import { getRecentPosts } from 'api/post';
+import { getUser } from 'api/user';
+import { searchPostByMaterial } from 'api/pesq';
 
 export default function TelaInicial() {
-  const [postagens, setPostagens] = useState([]);
+  const [user, setUser] = useState<any | null>(null);
+  const [postagens, setPostagens] = useState<any[]>([]);
   const [showPostModal, setShowPostModal] = useState(false);
+  const [selectedMateriais, setSelectedMateriais] = useState<number[]>([]);
+
+   const fetchUser = async() => {
+      try {      
+        const userId = Number(localStorage.getItem('user_id'));
+        const user = await getUser(userId);
+    
+        setUser(user as any);
+      } catch (error) {
+        console.log(error, 'error')
+      }
+    };
 
   useEffect(() => {
     const fetchPostagens = async () => {
-      const res = await fetch('/api/postagens');
-      const data = await res.json();
-      setPostagens(data);
+      const res = await getRecentPosts();
+      console.log(res, 'res')
+      setPostagens(res);
     };
 
+    fetchUser();
     fetchPostagens();
   }, []);
+
+  const handleFilterByMaterial = async(materiais: number[]) => {
+    try {
+      const response = await searchPostByMaterial(materiais);
+
+      console.log(response, 'response')
+      setPostagens([...response]);
+    } catch (error) {
+      console.log(error, 'error');
+    }
+  };
 
   const handleNovaPostagem = (
     titulo: string,
@@ -62,56 +90,71 @@ export default function TelaInicial() {
   ];
 
   return (
-    <Container>
-      <SideBar />
+    <>
+      {postagens?.length && user && (
+        
+        <Container>
+          <SideBar />
 
-      <MainContent>
+          <MainContent>
 
-        <TopBar>
-            <div className="logo-wrapper">
-              <Image src={Logo} alt="logo" width={49} height={53} />
-              <span className="logo-text">ReciClique</span>
-            </div>
-            
-            <div className="search">
-              <SearchModal />
-            </div>
+            <TopBar>
+                <div className="logo-wrapper">
+                  <Image src={Logo} alt="logo" width={49} height={53} />
+                  <span className="logo-text">ReciClique</span>
+                </div>
+                
+                <div className="search">
+                  <SearchModal
+                    onSearch={handleFilterByMaterial}
+                    selected={selectedMateriais}
+                    setSelected={setSelectedMateriais}
+                  />
+                </div>
 
-            <button className="postagem" onClick={() => setShowPostModal(true)}>
-              + Nova Postagem
-            </button>
-        </TopBar>
+                <button className="postagem" onClick={() => setShowPostModal(true)}>
+                  + Nova Postagem
+                </button>
+            </TopBar>
 
 
-        <NewPostModal
-          isOpen={showPostModal}
-          onClose={() => setShowPostModal(false)}
-          onSubmit={handleNovaPostagem}
-        />
+            <NewPostModal
+              isOpen={showPostModal}
+              onClose={() => setShowPostModal(false)}
+              onSubmit={handleNovaPostagem}
+            />
 
-        <Divisor />
+            <Divisor />
 
-        {/* Mock de postagem para exibição */}
-        <Postagem
-          userPhoto="/img/user1.jpg"
-          userName="Lore"
-          dateTime="17/07/2025 ás 14:00"
-          projectTitle="Vaso de Garrafa PET"
-          projectDescription="Um jardim feito com materiais recicláveis, ideal para varandas."
-          materials="Garrafa PET, estilete, cola quente"
-          tutorialLink="https://www.youtube.com/watch?v=xTqb6B03TI0"
-          projectPhoto={['/img/projeto.jpg', '/img/projeto2.jpg']}
-          liked={false}
-          disliked={false}
-          likes={15}
-          dislikes={1}
-          comments={comentariosMock}
-          currentIndex={0}
-          onNavigate={() => {}}
-          onEdit={() => alert('Editar postagem')}
-          onDelete={() => alert('Postagem deletada')}
-        />
-      </MainContent>
-    </Container>
+            {postagens.length === 0 ? (
+                <p style={{ textAlign: 'center', marginTop: '2rem' }}>
+                  Nenhuma postagem encontrada com os materiais selecionados.
+                </p>
+              ) : (
+              postagens.map((postagem, index) => (
+                <div key={index}>
+                  <Postagem
+                    userName={user.name}
+                    dateTime={postagem.created_at}
+                    projectTitle={postagem.title}
+                    projectDescription={postagem.description}
+                    materials={postagem.post_materiais.map((post_material: any) => post_material.material.name).join(', ')}
+                    tutorialLink={postagem.link}
+                    projectPhoto={[postagem.photo, postagem.photo_2, postagem.photo_3]}
+                    liked={postagem.post_likes?.find(like => like.user_id === user.id)}
+                    disliked={false}
+                    likes={10}
+                    dislikes={2}
+                    comments={postagem.comments}
+                    post={postagem}
+                    // deletePost={() =>handleDeletePost(post.id)}
+                  />
+                </div>
+              )))
+            }
+          </MainContent>
+        </Container>
+      )}
+    </>
   );
 }

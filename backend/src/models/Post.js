@@ -30,6 +30,8 @@ class Post extends Model {
         this.hasMany(models.Comment, { foreignKey: 'post_id', as: 'comments' })
 
         this.hasMany(models.PostMaterial, { foreignKey: 'post_id', as: 'post_materiais' })
+
+        this.hasMany(models.PostLike, { foreignKey: 'post_id', as: 'post_likes' })
     }
 }
 

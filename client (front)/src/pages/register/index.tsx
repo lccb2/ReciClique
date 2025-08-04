@@ -9,28 +9,44 @@ import {
   Field
 } from './style';
 import { useRouter } from 'next/router';
+import { register } from '../../api/aut';
+
 export const Register = ({ onBack }: { onBack: () => void }) => {
   const router = useRouter();
   const [form, setForm] = useState({
-    nome: '',
+    name: '',
     email: '',
-    telefone: '',
+    phone: '',
     instagram: '',
     mostrarTelefone: true,
     mostrarInstagram: true,
-    foto: null as File | null,
+    photo: null as File | null,
   });
 
   const [step, setStep] = useState<'form' | 'senha'>('form');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
 
-  const handleLogin = () => {
-        router.push('/profile');
-    
+  const handleRegister = async () => {
+    if (password != confirmPassword) {
+      return;
+    }
+
+    try {
+      await register({
+        ...form,
+        password
+      });
+  
+      router.push('/login');
+    } catch (error) {
+      console.log(error, 'error');
+    }
   };
 
   const handleFotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setForm({ ...form, foto: e.target.files[0] });
+      setForm({ ...form, photo: e.target.files[0] });
     }
   };
 
@@ -44,11 +60,11 @@ export const Register = ({ onBack }: { onBack: () => void }) => {
         <Field>
 
         <label><span style={{color:'red'}}>*</span> Senha</label>
-        <Input type="password" placeholder="********" />
+        <Input type="password" placeholder="********" value={password} onChange={(e) => setPassword(e.target.value)} />
         </Field>
         <Field>
         <label><span style={{color:'red'}}>*</span> Confirmação de senha</label>
-        <Input type="password" placeholder="********" />
+        <Input type="password" placeholder="********" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
         </Field>
 
         <ul style={{fontSize: '0.8rem', color: '#888', marginTop: '1rem'}}>
@@ -58,7 +74,7 @@ export const Register = ({ onBack }: { onBack: () => void }) => {
           <li>Pelo menos 8 caracteres</li>
         </ul>
 
-        <Button onClick={handleLogin}> Confirmar</Button>
+        <Button onClick={handleRegister}> Confirmar</Button>
         <SecondaryButton onClick={onBack}>Voltar para o Login</SecondaryButton>
       </Form>
     );
@@ -91,8 +107,8 @@ export const Register = ({ onBack }: { onBack: () => void }) => {
       <label><span style={{color:'red'}}>*</span> Nome de Usuário</label>
       <Input
         placeholder="Digite o nome de usuário"
-        value={form.nome}
-        onChange={e => setForm({ ...form, nome: e.target.value })}
+        value={form.name}
+        onChange={e => setForm({ ...form, name: e.target.value })}
       />
       </Field>
       <Field>
@@ -107,8 +123,8 @@ export const Register = ({ onBack }: { onBack: () => void }) => {
       <label><span style={{color:'red'}}>*</span> Telefone</label>
       <Input
         placeholder="Digite o seu telefone"
-        value={form.telefone}
-        onChange={e => setForm({ ...form, telefone: e.target.value })}
+        value={form.phone}
+        onChange={e => setForm({ ...form, phone: e.target.value })}
       />
         <CheckboxContainer>
         <input

@@ -6,19 +6,48 @@ class User extends Model {
     static init(sequelize) {
         super.init({
             name: DataTypes.STRING,
-            email: DataTypes.STRING,
-            username: {
+            email: {
                 type: DataTypes.STRING,
                 unique: true
             },
             password: DataTypes.STRING,
             password_sent: DataTypes.VIRTUAL,
+            photo: DataTypes.STRING,
+            instagram: {
+                type: DataTypes.STRING,
+                allowNull: true
+            },
+            phone: {
+                type: DataTypes.STRING,
+                allowNull: false
+            },
+            greeting: {
+                type: DataTypes.TEXT,
+                allowNull: true
+            },
+            show_email:{
+                type: DataTypes.BOOLEAN,
+                defaultValue : false,
+                allowNull: false
+            },
+            show_phone:{
+                type: DataTypes.BOOLEAN,
+                defaultValue : false,
+                allowNull: false
+            },
+            show_insta:{
+                type: DataTypes.BOOLEAN,
+                defaultValue : false,
+                allowNull: false
+            }
         }, {
             sequelize
         })
 
         this.addHook('beforeSave', async user => {
-            user.password = await bcryptjs.hash(user.password_sent, 8);
+            if (user.password_sent) {
+                user.password = await bcryptjs.hash(user.password_sent, 8);
+            }
         });
     }
 

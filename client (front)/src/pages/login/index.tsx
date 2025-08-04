@@ -18,6 +18,7 @@ import { useRouter } from 'next/router';
 import Image from 'next/image';
 import { SideBg } from '../../assets';
 import { Register } from 'pages/register';
+import { login } from 'api/aut';
 
 export default function Login() {
   const router = useRouter();
@@ -29,9 +30,18 @@ export default function Login() {
     return form.email && form.password;
   };
 
-  const handleLogin = () => {
+  const handleLogin = async() => {
     if (isFormValid()) {
-      router.push('/profile');
+      try {
+        const response = await login(form);
+
+        localStorage.setItem('token', response.token);
+        localStorage.setItem('user_id', response.id);
+
+        router.push('/profile');
+      } catch (error) {
+        console.log(error);
+      }
     }
   };
 

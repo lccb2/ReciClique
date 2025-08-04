@@ -16,21 +16,25 @@ module.exports = {
 
     //Atualiza informações do usuário;
     async update(req, res){
-        const { userId } = req;
-        const { name, email, username, password } = req.body;
-
-        console.log(userId)
-        const user = await User.findByPk(userId);
-
-        if(!user) {
-            return res.status(400).json({ error: 'Usuário não achado' });
+        try {
+            const { userId } = req;
+            const { name, email, username, password } = req.body;
+    
+            const user = await User.findByPk(userId);
+    
+            if(!user) {
+                return res.status(400).json({ error: 'Usuário não achado' });
+            }
+    
+            Object.assign(user, { name, email, username, password_sent: password } );
+    
+            await user.save();
+    
+            return res.json(user);
+            
+        } catch (error) {
+            console.log(error, 'error')
         }
-
-        Object.assign(user, { name, email, username, password_sent: password } );
-
-        await user.save();
-
-        return res.json(user);
     },
 
     //Deletando usuário;

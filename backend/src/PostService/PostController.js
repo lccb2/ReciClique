@@ -2,23 +2,37 @@ const User = require('../models/User');
 const Post = require('../models/Post');
 const PostMaterial = require('../models/PostMaterial');
 const Materiais = require('../models/Materiais');
+const Comment = require('../models/Comment');
+const PostLike = require('../models/PostLike');
 
 module.exports = {
     //Criando nova publicação
     async store(req, res){
         try {
             const { userId } = req;
-            const { photo, title, description, link, photo_2, photo_3 } = req.body;
+            const { title, description, link } = req.body;
+            const photos = req.files;
+
+            let photo;
+            let photo_2;
+            let photo_3;
 
             const user = await User.findByPk(userId);
+
             if(!user) {
                 return res.status(400).json({ error: 'Usuário não achado' });
+            }
+
+            if (photos?.length) {
+                photo = photos[0].filename || null;
+                photo_2 = photos[1].filename || null;
+                photo_3 = photos[2].filename || null;
             }
 
             const { materiais } = req.body;
 
             materiais.map(async material => {
-                const materialExiste = await Materiais.findByPk(material);
+                const materialExiste = await Materiais.findByPk(Number(material));
 
                 if (!materialExiste) {
                     return res.status(400).json({ error: "Material não achado" })
@@ -55,7 +69,26 @@ module.exports = {
     async show(req, res){
         const { post_id } = req.params;
 
-        const post = await Post.findByPk(post_id);
+        const post = await Post.findOne({ 
+            where: {id: post_id},
+            include: [{
+                model: Comment,
+                as: 'comments'
+            }, {
+                model: PostMaterial,
+                as: 'post_materiais',
+                attributes: ['id', 'material_id'],
+                include: [{
+                    model: Materiais,
+                    as: 'material',
+                    attributes: ['id', 'name']
+                }]
+            }, {
+                model: PostLike,
+                as: 'post_likes'
+            }],
+            nest: true 
+        });
 
         if(!post) {
             return res.status(400).json({ error: 'Publicação não achada' });
@@ -136,6 +169,23 @@ module.exports = {
         try {
             const posts = await Post.findAll({
                 order: [['created_at', 'DESC']],
+                include: [{
+                    model: Comment,
+                    as: 'comments'
+                }, {
+                    model: PostMaterial,
+                    as: 'post_materiais',
+                    attributes: ['id', 'material_id'],
+                    include: [{
+                        model: Materiais,
+                        as: 'material',
+                        attributes: ['id', 'name']
+                    }]
+                }, {
+                    model: PostLike,
+                    as: 'post_likes'
+                }],
+                nest: true 
             });
 
             return res.status(200).json(posts);

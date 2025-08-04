@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Container,
   SearchInput,
@@ -7,104 +7,143 @@ import {
   Actions,
   EmptyState
 } from './style';
+import { getMateriais } from 'api/pesq';
 
-const allItems = [
-  "Garrafa PET - 250ml", "Garrafa PET - 500ml", "Garrafa PET - 750ml", "Garrafa PET - 1L",
-  "Garrafa PET - 2L", "Garrafa PET", "Folha de Papel", "Jornal", "Caixa de Papelão",
-  "Embalagem de Produto de Limpeza", "Pote de Plástico", "Sacola Plástica", "Revista",
-  "Frasco de Cosmético", "Tampa de Garrafa", "Tampa de Pote", "Garrafa de Vidro",
-  "Lata de Alumínio", "Pote de Vidro", "Papel Alumínio", "Pilha", "Cabos", "Pneu",
-  "Roupas", "Tecidos", "Lâmpada", "Cola Branca", "Terra"
-];
+interface Material {
+  id: number;
+  name: string;
+}
 
-export default function SearchModal() {
+interface SearchModalProps {
+  onSearch: (materiais: number[]) => void;
+  selected: number[];
+  setSelected: React.Dispatch<React.SetStateAction<number[]>>;
+}
+
+export default function SearchModal({ onSearch, selected, setSelected }: SearchModalProps) {
   const [query, setQuery] = useState('');
-  const [selected, setSelected] = useState<string[]>([]);
   const [isFocused, setIsFocused] = useState(false);
+  const [materiais, setMateriais] = useState<Material[]>([]);
 
-  // define se o modal está expandido
   const isExpanded = isFocused || selected.length > 0;
 
-  const handleSelect = (item: string) => {
-    if (!selected.includes(item)) {
-      setSelected([...selected, item]);
+  const handleSelect = (item: Material) => {
+    if (!selected.includes(item.id)) {
+      setSelected([...selected, item.id]);
+      setQuery('');
     }
   };
 
-  const handleRemove = (item: string) => {
-    setSelected(selected.filter(i => i !== item));
+  const handleRemove = (id: number) => {
+    setSelected(selected.filter(i => i !== id));
   };
 
-  const filteredItems = allItems.filter(item =>
-    item.toLowerCase().includes(query.toLowerCase()) &&
-    !selected.includes(item)
+  const filteredItems = materiais.filter(item =>
+    item.name.toLowerCase().includes(query.toLowerCase()) &&
+    !selected.includes(item.id)
   );
 
+  const fetchMateriais = async () => {
+    try {
+      const response = await getMateriais();
+      setMateriais(response);
+    } catch (error) {
+      console.log(error, 'error');
+    }
+  };
+
+  useEffect(() => {
+    fetchMateriais();
+  }, []);
+
   return (
-    <Container isExpanded={isExpanded}>
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-        <SearchInput>
-          <input
-            type="text"
-            placeholder="Pesquise por um Item"
-            value={query}
-            onFocus={() => setIsFocused(true)}
-            onBlur={() => setTimeout(() => setIsFocused(false), 200)}
-            onChange={e => setQuery(e.target.value)}
-          />
-          {query && (
-            <button onClick={() => setQuery('')}>✖</button>
-          )}
-        </SearchInput>
-
-        {isExpanded && (
-          <>
-            {selected.length > 0 && (
-              <div>
-                <h4>Itens Selecionados</h4>
-                <Suggestions>
-                  {selected.map(item => (
-                    <Tag key={item} selected onClick={() => handleRemove(item)}>
-                      ✖ {item}
-                    </Tag>
-                  ))}
-                </Suggestions>
-              </div>
-            )}
-
-            <div style={{ flex: 1 }}>
-              {query && filteredItems.length === 0 && selected.length === 0 ? (
-                <EmptyState>
-                  Não encontramos nenhum resultado para a sua busca.
-                  <br />
-                  Que tal verificar a ortografia ou tentar com outras palavras?
-                </EmptyState>
-              ) : (
-                <>
-                  {!query && <h4>Sugestão de Itens</h4>}
-                  <Suggestions>
-                    {filteredItems.map(item => (
-                      <Tag key={item} onClick={() => handleSelect(item)}>
-                        {item}
-                      </Tag>
-                    ))}
-                  </Suggestions>
-                </>
+    <>
+      {materiais && (
+        <Container isExpanded={isExpanded}>
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+            <SearchInput>
+              <input
+                type="text"
+                placeholder="Pesquise por um Item"
+                value={query}
+                onFocus={() => setIsFocused(true)}
+                onBlur={() => setTimeout(() => setIsFocused(false), 200)}
+                onChange={e => setQuery(e.target.value)}
+              />
+              {query && (
+                <button onClick={() => setQuery('')}>✖</button>
               )}
-            </div>
+            </SearchInput>
 
-            <Actions>
-              <button className="back" onClick={() => {
-                setQuery('');
-                setSelected([]);
-                setIsFocused(false);
-              }}>Voltar</button>
+            {isExpanded && (
+              <>
+                {selected.length > 0 && (
+                  <div>
+                    <h4>Itens Selecionados</h4>
+                    <Suggestions>
+                      {selected.map(id => {
+                        const item = materiais.find(m => m.id === id);
+                        if (!item) return null;
+                        return (
+                          <Tag key={id} selected onClick={() => handleRemove(id)}>
+                            ✖ {item.name}
+                          </Tag>
+                        );
+                      })}
+                    </Suggestions>
+                  </div>
+                )}
 
-              <button className="filter">Filtrar</button>
-            </Actions>
-          </>
-        )}
-      </div>
-    </Container>
+                <div style={{ flex: 1 }}>
+                  {query && filteredItems.length === 0 && selected.length === 0 ? (
+                    <EmptyState>
+                      Não encontramos nenhum resultado para a sua busca.
+                      <br />
+                      Que tal verificar a ortografia ou tentar com outras palavras?
+                    </EmptyState>
+                  ) : (
+                    <>
+                      {!query && <h4>Sugestão de Itens</h4>}
+                      <Suggestions>
+                        {filteredItems.map(item => (
+                          <Tag key={item.id} onClick={() => handleSelect(item)}>
+                            {item.name}
+                          </Tag>
+                        ))}
+                      </Suggestions>
+                    </>
+                  )}
+                </div>
+
+                <Actions>
+                  <button
+                    className="back"
+                    onClick={() => {
+                      setQuery('');
+                      setSelected([]);
+                      setIsFocused(false);
+                    }}
+                  >
+                    Voltar
+                  </button>
+
+                  <button
+                    className="filter"
+                    onClick={() => {
+                      if (selected?.length) {
+                        onSearch(selected)
+                      }
+                      setIsFocused(false);
+                    }}
+                  >
+                    Filtrar
+                  </button>
+                </Actions>
+              </>
+            )}
+          </div>
+        </Container>
+      )}
+    </>
   );
 }
