@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
-import Image, { StaticImageData } from "next/image";
+import Image from "next/image";
+import { useRouter } from "next/router";
 import {
   CardContainer,
   ContentWrapper,
@@ -36,13 +37,11 @@ import { baseURL } from "api/base";
 import {
   FaHeart,
   FaRegHeart,
-  FaThumbsDown,
   FaRegCommentDots,
   FaChevronLeft,
   FaChevronRight,
 } from "react-icons/fa";
 import { InteractionButton } from "components/CommentViewer/style";
-import { LineStyle } from "@mui/icons-material";
 import {
   createComment,
   getPostComments,
@@ -89,7 +88,7 @@ export default function Postagem({
   disliked: initialDisliked,
   likes: initialLikes = 0,
   dislikes: initialDislikes = 0,
-  comments: initialComments = [], // Valor padrão
+  comments: initialComments = [],
   onEdit,
   onDelete,
   deletePost,
@@ -102,12 +101,12 @@ export default function Postagem({
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [liked, setLiked] = useState(initialLiked);
-  // const [disliked, setDisliked] = useState(initialDisliked);
   const [likes, setLikes] = useState(initialLikes ?? 0);
-  // const [dislikes, setDislikes] = useState(initialDislikes ?? 0);
   const [currentCommentIndex, setCurrentCommentIndex] = useState(0);
   const [showCommentModal, setShowCommentModal] = useState(false);
   const [comments, setComments] = useState<[]>([]);
+
+  const router = useRouter();
 
   const [userId, setUserId] = useState(Number(localStorage.getItem("user_id")));
 
@@ -140,10 +139,10 @@ export default function Postagem({
   const handleLikePost = async () => {
     if (liked) {
       await unlikePost(post.id);
-
       const updatedPost = await getPost(post.id);
 
       setCurrentPost(updatedPost);
+      setLikes(updatedPost.post_likes.length);
 
       setLiked(false);
 
@@ -155,60 +154,11 @@ export default function Postagem({
 
       setCurrentPost(updatedPost);
 
+      setLikes(updatedPost.post_likes.length);
       setLiked(true);
       onLikeUpdate?.(post.id, true);
     }
   };
-
-  // const handleDislikePost = () => {
-  //   if (disliked) {
-  //     setDisliked(false);
-  //     setDislikes((prev) => Math.max(prev - 1, 0));
-  //   } else {
-  //     setDisliked(true);
-  //     setDislikes((prev) => prev + 1);
-  //     if (liked) {
-  //       setLiked(false);
-  //       setLikes((prev) => Math.max(prev - 1, 0));
-  //     }
-  //   }
-  // };
-
-  // const handleCommentLike = (id: number) => {
-  //   setComments((prev) =>
-  //     prev.map((c) => {
-  //       if (c.id === id) {
-  //         const isLiked = !c.liked;
-  //         return {
-  //           ...c,
-  //           liked: isLiked,
-  //           disliked: isLiked ? false : c.disliked,
-  //           likes: isLiked ? (c.likes ?? 0) + 1 : Math.max((c.likes ?? 1) - 1, 0),
-  //           dislikes: isLiked && c.disliked ? Math.max((c.dislikes ?? 1) - 1, 0) : c.dislikes,
-  //         };
-  //       }
-  //       return c;
-  //     })
-  //   );
-  // };
-
-  // const handleCommentDislike = (id: number) => {
-  //   setComments((prev) =>
-  //     prev.map((c) => {
-  //       if (c.id === id) {
-  //         const isDisliked = !c.disliked;
-  //         return {
-  //           ...c,
-  //           disliked: isDisliked,
-  //           liked: isDisliked ? false : c.liked,
-  //           dislikes: isDisliked ? (c.dislikes ?? 0) + 1 : Math.max((c.dislikes ?? 1) - 1, 0),
-  //           likes: isDisliked && c.liked ? Math.max((c.likes ?? 1) - 1, 0) : c.likes,
-  //         };
-  //       }
-  //       return c;
-  //     })
-  //   );
-  // };
 
   const photos = useMemo(() => {
     const list = Array.isArray(projectPhoto) ? projectPhoto : [projectPhoto];
@@ -239,7 +189,7 @@ export default function Postagem({
 
   return (
     <>
-      {currentPost && photos && photos.length && (
+      {currentPost && photos && photos.length && userId && (
         <CardContainer>
           <ContentWrapper>
             <LeftContent>
@@ -253,7 +203,11 @@ export default function Postagem({
                       height={50}
                     />
                   </UserPhoto>
-                  <UserNameDate>
+                  <UserNameDate
+                    onClick={() =>
+                      router.push(`/galeria/${currentPost.user_id}`)
+                    }
+                  >
                     <strong>{userName}</strong>
                     <DateTime>{dateTime}</DateTime>
                   </UserNameDate>
@@ -297,7 +251,7 @@ export default function Postagem({
               <IconsRow>
                 <InteractionButton onClick={handleLikePost} active={liked}>
                   {liked ? <FaHeart /> : <FaRegHeart />}
-                  <span>{post?.post_likes?.length || 0}</span>
+                  <span>{likes}</span>
                 </InteractionButton>
 
                 {/* <InteractionButton onClick={handleDislikePost} active={disliked}>
@@ -341,8 +295,6 @@ export default function Postagem({
           {comments?.length > 0 && (
             <CommentViewer
               comments={comments}
-              // onLike={handleCommentLike}
-              // onDislike={handleCommentDislike}
               currentIndex={currentCommentIndex}
               onNavigate={setCurrentCommentIndex}
             />

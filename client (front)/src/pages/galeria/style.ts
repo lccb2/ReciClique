@@ -1,10 +1,10 @@
-import styled from 'styled-components';
-import { ProfileBg } from '../../assets';
+import styled from "styled-components";
+import { ProfileBg } from "../../assets";
 
 export const Container = styled.div`
   display: flex;
   height: 100vh;
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   background-image: url(${ProfileBg.src});
   background-size: cover;
   background-position: center;
@@ -105,10 +105,9 @@ export const MainContent = styled.main`
   padding-bottom: 2rem;
 `;
 
-
 export const Title = styled.h1`
   color: #4c3127;
-  font-family: 'Amatic SC';
+  font-family: "Amatic SC";
   font-size: 3.62831rem;
   font-style: normal;
   font-weight: 700;
@@ -117,12 +116,11 @@ export const Title = styled.h1`
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  
 `;
 
 export const Description = styled.h1`
   color: rgba(0, 0, 0, 0.88);
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-size: 0.875rem;
   font-style: normal;
   font-weight: 400;
@@ -161,8 +159,9 @@ export const UserInfo = styled.div`
   justify-content: space-between;
   align-items: flex-start;
   flex-wrap: wrap;
-  margin: 1.5rem 2rem 1.5rem 2rem; 
-  font-family: 'Montserrat', sans-serif;
+  margin: 1.5rem 2rem 1.5rem 2rem;
+  font-family: "Montserrat", sans-serif;
+  gap: 2rem;
 
   .left {
     display: flex;
@@ -193,7 +192,7 @@ export const UserInfo = styled.div`
   .other {
     font-size: 0.95rem;
     font-weight: 400;
-    color: #333
+    color: #333;
   }
 
   .greeting {

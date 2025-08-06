@@ -11,27 +11,20 @@ import {
   NavButtons,
   NavButton,
   IconsRow,
-  InteractionButton
 } from './style';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
-import { FaHeart, FaRegHeart, FaThumbsDown } from 'react-icons/fa';
-import { Comment } from '../../types/comment';
 import { baseURL } from 'api/base';
 
 type Props = {
   comments: any[];
   currentIndex: number;
   onNavigate: (newIndex: number) => void;
-  onLike?: (id: number) => void;
-  onDislike?: (id: number) => void;
 };
 
 export default function CommentViewer({
   comments,
   currentIndex,
   onNavigate,
-  onLike,
-  onDislike,
 }: Props) {
   if (comments.length === 0) return null;
 
@@ -53,15 +46,6 @@ export default function CommentViewer({
 
       <Bottom>
         <IconsRow>
-          <InteractionButton onClick={() => onLike?.(comment.id)} active={comment.liked}>
-            {comment.liked ? <FaHeart /> : <FaRegHeart />}
-            <span>{comment.likes ?? 0}</span>
-          </InteractionButton>
-
-          <InteractionButton onClick={() => onDislike?.(comment.id)} active={comment.disliked}>
-            <FaThumbsDown />
-            <span>{comment.dislikes ?? 0}</span>
-          </InteractionButton>
         </IconsRow>
 
         <NavButtons>

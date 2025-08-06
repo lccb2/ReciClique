@@ -104,3 +104,12 @@ export const getRecentPosts = async() => {
         throw error;
     }
 }
+
+export const getUserPosts = async(userId: number) => {
+    try {
+        const response = await api.get(`/posts/user/${userId}`);
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+}

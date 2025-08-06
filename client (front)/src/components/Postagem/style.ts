@@ -72,6 +72,7 @@ export const UserNameDate = styled.div`
   flex-direction: column;
   align-items: flex-start;
   color: #4C3127;
+  cursor: pointer;
 
   strong {
     font-weight: 700;

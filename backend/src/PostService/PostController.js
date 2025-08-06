@@ -87,7 +87,7 @@ module.exports = {
                 model: PostLike,
                 as: 'post_likes'
             }],
-            nest: true 
+            nest: true
         });
 
         if(!post) {
@@ -119,44 +119,44 @@ module.exports = {
 
     //Atualiza informações do post;
     async update(req, res){
-        try {    
+        try {
             const { post_id } = req.params;
             const { photo, title, description, link, photo_2, photo_3, materiais } = req.body;
-    
+
             const post = await Post.findByPk(post_id);
-    
+
             if(!post) {
                 return res.status(400).json({ error: 'Post não achado' });
             }
-    
-    
+
+
             for (const material of materiais) {
                 const materialExiste = await Materiais.findByPk(material);
-    
+
                 if (!materialExiste) {
                     throw new Error("Material não achado")
                 }
             }
-    
+
             await PostMaterial.destroy({
                 where: {
                 post_id: post_id
                 }
             });
-    
+
             const postMateriais = materiais.map(material => {
                 return {
                     post_id: post.id,
                     material_id: material
                 }
             });
-    
+
             await PostMaterial.bulkCreate(postMateriais);
-    
+
             Object.assign(post, { photo, title, description, link, photo_2, photo_3 } );
-    
+
             await post.save();
-    
+
             return res.json(post);
         } catch (error) {
             return res.status(400).json({ error: error.message })
@@ -185,7 +185,7 @@ module.exports = {
                     model: PostLike,
                     as: 'post_likes'
                 }],
-                nest: true 
+                nest: true
             });
 
             return res.status(200).json(posts);
@@ -194,4 +194,32 @@ module.exports = {
             return res.status(500).json({ message: 'Erro ao listar posts' });
         }
     },
+
+    async userPosts(req, res){
+        const { user_id } = req.params;
+
+        const posts = await Post.findAll({
+            where: { user_id },
+            order: [['created_at', 'DESC']],
+            include: [{
+                model: Comment,
+                as: 'comments'
+            }, {
+                model: PostMaterial,
+                as: 'post_materiais',
+                attributes: ['id', 'material_id'],
+                include: [{
+                    model: Materiais,
+                    as: 'material',
+                    attributes: ['id', 'name']
+                }]
+            }, {
+                model: PostLike,
+                as: 'post_likes'
+            }],
+            nest: true
+        });
+
+        return res.status(200).json(posts);
+    }
 };

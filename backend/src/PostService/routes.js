@@ -11,5 +11,6 @@ routes.get('/posts/recent', loginRequired, PostController.recent);
 routes.get('/posts/:post_id', loginRequired, PostController.show);
 routes.delete('/posts/:post_id', loginRequired, PostController.erase);
 routes.patch('/posts/:post_id', [loginRequired, upload.array('photos')], PostController.update);
+routes.get('/posts/user/:user_id', loginRequired, PostController.userPosts);
 
 module.exports = routes;
