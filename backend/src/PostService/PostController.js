@@ -61,6 +61,7 @@ module.exports = {
 
             return res.json(post);
         } catch (error) {
+            console.log(error);
             throw error;
         }
     },

@@ -8,6 +8,8 @@ class Materiais extends Model {
         }, {
             sequelize,
             tableName: 'materiais',
+            createdAt: 'created_at',
+            updatedAt: 'updated_at'
         })
     }
 

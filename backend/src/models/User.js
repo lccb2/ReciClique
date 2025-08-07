@@ -41,7 +41,10 @@ class User extends Model {
                 allowNull: false
             }
         }, {
-            sequelize
+            sequelize,
+            tableName: 'users',
+            createdAt: 'created_at',
+            updatedAt: 'updated_at'
         })
 
         this.addHook('beforeSave', async user => {

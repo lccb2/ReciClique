@@ -114,7 +114,7 @@ const NewPostModal: React.FC<Props> = ({ isOpen, onClose, onPostCreated }) => {
 
   return (
     <>
-      {materiais.length > 0 && (
+      {materiais?.length > 0 && (
         <Overlay onClick={onClose}>
           <ModalContainer onClick={(e) => e.stopPropagation()}>
             {showConfirmPost ? (

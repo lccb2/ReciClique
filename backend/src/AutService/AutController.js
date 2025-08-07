@@ -3,35 +3,41 @@ const User = require('../models/User')
 
 module.exports = {
     async register(req, res){
-        const { name, email, instagram, phone, password, show_email, show_phone, show_insta, greeting } = req.body;
-        const photo = req.file?.filename;
-
-        const hasUser = await User.findOne({
-            where: {
-                email
-            }
-        });
-
-        if (hasUser) {
-            return res.status(403).json({
-                errors: ['Email já cadastrado!']
+        try {
+            const { name, email, instagram, phone, password, show_email, show_phone, show_insta, greeting } = req.body;
+            const photo = req.file?.filename;
+        
+            const hasUser = await User.findOne({
+                where: {
+                    email
+                },
+                logging: console.log
             });
+        
+            if (hasUser) {
+                return res.status(403).json({
+                    errors: ['Email já cadastrado!']
+                });
+            }
+        
+            const user = await User.create({
+                name,
+                email,
+                instagram,
+                photo,
+                phone,
+                password_sent: password,
+                show_email,
+                show_phone,
+                show_insta,
+                greeting
+            });
+        
+            return res.json(user);
+
+        } catch (error) {
+            console.log(error);
         }
-
-        const user = await User.create({
-            name,
-            email,
-            instagram,
-            photo,
-            phone,
-            password_sent: password,
-            show_email,
-            show_phone,
-            show_insta,
-            greeting
-        });
-
-        return res.json(user);
     },
 
     async login(req,res) {
