@@ -4,13 +4,6 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-
-    "start:aut": "ts-node src/AutService/index.ts",
-    "start:post": "ts-node src/PostService/index.ts",
-    "start:user": "ts-node src/UserService/index.ts",
-    "start:coment": "ts-node src/ComentService/index.ts",
-    "start:pag": "ts-node src/PagService/index.ts",
-    "start:pesq": "ts-node src/PesqService/index.ts",
     "dev": "nodemon src/server.js"
   },
   "dependencies": {
