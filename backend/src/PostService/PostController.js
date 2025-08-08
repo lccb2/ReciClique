@@ -173,7 +173,11 @@ module.exports = {
     async update(req, res){
         try {
             const { post_id } = req.params;
-            const { photo, title, description, link, photo_2, photo_3, materiais } = req.body;
+            const { userId } = req;
+            const { title, description, link, materiais } = req.body;
+            const photos = req.files;
+
+            console.log(photos);
 
             const post = await Post.findByPk(post_id);
 
@@ -181,8 +185,24 @@ module.exports = {
                 return res.status(400).json({ error: 'Post não achado' });
             }
 
-            for (const material of materiais) {
-                const materialExiste = await Materiais.findByPk(material);
+            if (post.user_id !== userId) {
+                return res.status(401).json({ error: 'Post não pertence ao usuário logado!' });
+            }
+
+            let photo = null;
+            let photo_2 = null;
+            let photo_3 = null;
+
+            if (photos?.length) {
+                photo = await uploadToSupabase(photos[0], userId, 1);
+                photo_2 = photos[1] ? await uploadToSupabase(photos[1], userId, 2) : null;
+                photo_3 = photos[2] ? await uploadToSupabase(photos[2], userId, 3) : null;
+            }
+
+            const materiaisIds = Array.isArray(materiais) ? materiais : JSON.parse(materiais);
+
+            for (const materialId of materiaisIds) {
+                const materialExiste = await Materiais.findByPk(Number(materialId));
 
                 if (!materialExiste) {
                     throw new Error("Material não achado")
@@ -195,10 +215,10 @@ module.exports = {
                 }
             });
 
-            const postMateriais = materiais.map(material => {
+            const postMateriais = materiaisIds.map(materialId => {
                 return {
                     post_id: post.id,
-                    material_id: material
+                    material_id: materialId
                 }
             });
 

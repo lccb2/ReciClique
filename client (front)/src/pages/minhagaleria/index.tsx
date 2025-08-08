@@ -46,6 +46,7 @@ export default function MinhaGaleria() {
 
   const handleDeletePost = async (postId: number) => {
     try {
+      console.log(postId, "postId");
       await deletePost(postId);
       toast.success("Postagem deletada com sucesso");
 

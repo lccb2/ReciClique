@@ -8,6 +8,6 @@ export const getGaleria = async(userId: number) => {
     } catch (error) {
         let message = "Erro inesperado";
 
-        return { error: message };
+        throw new Error(message);
     }
 }

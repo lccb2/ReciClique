@@ -33,6 +33,8 @@ import DeletePostModal from "../DeletePostModal";
 import EditPostModal from "../EditPostModal";
 import DefaultPhoto from "../../../public/img/default.jpg";
 
+import { deletePost as deletePostApi } from "api/post";
+
 import {
   FaHeart,
   FaRegHeart,
@@ -48,6 +50,7 @@ import {
   unlikePost,
 } from "api/comment";
 import { getPost } from "api/post";
+import toast from "react-hot-toast";
 
 interface PostProps {
   userPhoto: any;
@@ -111,6 +114,11 @@ export default function Postagem({
 
   const [currentPost, setCurrentPost] = useState(post);
 
+  const photos = useMemo(() => {
+    const list = Array.isArray(projectPhoto) ? projectPhoto : [projectPhoto];
+    return list.filter((p): p is string => typeof p === "string" && !!p);
+  }, [projectPhoto]);
+
   const handleIsLiked = () => {
     const userIdFromLocalStorage = localStorage.getItem("user_id");
     setUserId(userIdFromLocalStorage);
@@ -134,6 +142,11 @@ export default function Postagem({
     handleIsLiked();
     fetchComments();
   }, []);
+
+  // Reset currentImageIndex when photos change
+  useEffect(() => {
+    setCurrentImageIndex(0);
+  }, [photos]);
 
   const handleLikePost = async () => {
     if (liked) {
@@ -159,21 +172,20 @@ export default function Postagem({
     }
   };
 
-  const photos = useMemo(() => {
-    const list = Array.isArray(projectPhoto) ? projectPhoto : [projectPhoto];
-    return list.filter((p): p is string => typeof p === "string" && !!p);
-  }, [projectPhoto]);
-
   const getProjectPhoto = (photo: string) => photo;
 
   const handlePrevImage = () => {
-    setCurrentImageIndex(
-      (prev) => (prev - 1 + projectPhoto.length) % projectPhoto.length
-    );
+    if (photos.length > 1) {
+      setCurrentImageIndex(
+        (prev) => (prev - 1 + photos.length) % photos.length
+      );
+    }
   };
 
   const handleNextImage = () => {
-    setCurrentImageIndex((prev) => (prev + 1) % projectPhoto.length);
+    if (photos.length > 1) {
+      setCurrentImageIndex((prev) => (prev + 1) % photos.length);
+    }
   };
 
   const handleCreateComment = async (postId: number, comment: string) => {
@@ -186,9 +198,20 @@ export default function Postagem({
     }
   };
 
+  const handleDeletePost = async () => {
+    try {
+      await deletePostApi(post.id);
+      setShowDeleteModal(false);
+      window.location.reload();
+      toast.success("Postagem deletada com sucesso");
+    } catch (error) {
+      toast.error("Erro ao deletar postagem");
+    }
+  };
+
   return (
     <>
-      {currentPost && photos && photos.length && userId && (
+      {currentPost && userId && (
         <CardContainer>
           <ContentWrapper>
             <LeftContent>
@@ -268,26 +291,32 @@ export default function Postagem({
             </LeftContent>
 
             <RightContent>
-              <ProjectImageWrapper>
-                <CarouselArrow onClick={handlePrevImage}>
-                  <FaChevronLeft />
-                </CarouselArrow>
-                <ProjectImage>
-                  <Image
-                    src={
-                      photos[currentImageIndex]
-                        ? getProjectPhoto(photos[currentImageIndex])
-                        : DefaultPhoto
-                    }
-                    alt={`${projectTitle} - imagem ${currentImageIndex + 1}`}
-                    fill
-                    style={{ objectFit: "cover" }}
-                  />
-                </ProjectImage>
-                <CarouselArrow onClick={handleNextImage}>
-                  <FaChevronRight />
-                </CarouselArrow>
-              </ProjectImageWrapper>
+              {photos.length > 0 && (
+                <ProjectImageWrapper>
+                  {photos.length > 1 && (
+                    <CarouselArrow onClick={handlePrevImage}>
+                      <FaChevronLeft />
+                    </CarouselArrow>
+                  )}
+                  <ProjectImage>
+                    <Image
+                      src={
+                        photos[currentImageIndex]
+                          ? getProjectPhoto(photos[currentImageIndex])
+                          : DefaultPhoto
+                      }
+                      alt={`${projectTitle} - imagem ${currentImageIndex + 1}`}
+                      fill
+                      style={{ objectFit: "cover" }}
+                    />
+                  </ProjectImage>
+                  {photos.length > 1 && (
+                    <CarouselArrow onClick={handleNextImage}>
+                      <FaChevronRight />
+                    </CarouselArrow>
+                  )}
+                </ProjectImageWrapper>
+              )}
             </RightContent>
           </ContentWrapper>
 
@@ -324,7 +353,7 @@ export default function Postagem({
               onCancel={() => setShowDeleteModal(false)}
               onDelete={() => {
                 setShowDeleteModal(false);
-                deletePost();
+                handleDeletePost();
               }}
             />
           )}

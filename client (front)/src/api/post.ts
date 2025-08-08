@@ -41,7 +41,7 @@ export const createPost = async(data: CreatePostData) => {
     } catch (error) {
         let message = "Erro inesperado";
 
-        return { error: message };
+        throw new Error(message);
     }
 };
 
@@ -81,7 +81,7 @@ export const editPost = async(postId: number, data: EditPostData) => {
     });
 
     try {
-        const response = await api.patch(`/posts/${postId}`, data, {
+        const response = await api.patch(`/posts/${postId}`, formData, {
             headers: { 'Content-Type': 'multipart/form-data' }
         });
 
@@ -89,7 +89,7 @@ export const editPost = async(postId: number, data: EditPostData) => {
     } catch (error) {
         let message = "Erro inesperado";
 
-        return { error: message };
+        throw new Error(message);
     }
 };
 
@@ -99,7 +99,7 @@ export const deletePost = async(postId: number) => {
     } catch (error) {
         let message = "Erro inesperado";
 
-        return { error: message };
+        throw new Error(message);
     }
 };
 
@@ -110,7 +110,7 @@ export const getRecentPosts = async() => {
     } catch (error) {
         let message = "Erro inesperado";
 
-        return { error: message };
+        throw new Error(message);
     }
 }
 
@@ -121,6 +121,6 @@ export const getUserPosts = async(userId: number) => {
     } catch (error) {
         let message = "Erro inesperado";
 
-        return { error: message };
+        throw new Error(message);
     }
 }

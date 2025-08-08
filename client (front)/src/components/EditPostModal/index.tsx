@@ -69,7 +69,16 @@ const EditPostModal: React.FC<Props> = ({ isOpen, onClose, post }) => {
   };
 
   const removeImage = (index: number) => {
-    setImagens(imagens.filter((_, i) => i !== index));
+    console.log(index, 'index')
+    console.log(imagens, 'imagensAntes')
+
+    if (index === 0) {
+      setImagens([...imagens.slice(1)]);
+    } else if (index === 1) {
+      setImagens([...imagens.slice(0, 1), ...imagens.slice(2)]);
+    } else {
+      setImagens([...imagens.slice(0, 2), ...imagens.slice(3)]);
+    }
   };
 
   const handleSubmit = async () => {

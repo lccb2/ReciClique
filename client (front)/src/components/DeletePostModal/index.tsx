@@ -22,6 +22,18 @@ const DeletePostModal: React.FC<Props> = ({ isOpen, onCancel, onDelete }) => {
 
   if (!isOpen) return null;
 
+  const handleDelete = async () => {
+    setLoading(true);
+    try {
+      await onDelete();
+    } catch (error) {
+      toast.error("Erro ao excluir postagem");
+      console.error("Erro ao excluir postagem:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <ModalOverlay onClick={onCancel}>
       <ModalBox onClick={(e) => e.stopPropagation()}>
@@ -34,7 +46,7 @@ const DeletePostModal: React.FC<Props> = ({ isOpen, onCancel, onDelete }) => {
           <CancelButton onClick={onCancel} disabled={loading}>
             Cancelar
           </CancelButton>
-          <DeleteButton onClick={onDelete} disabled={loading}>
+          <DeleteButton onClick={handleDelete} disabled={loading}>
             {loading ? "Excluindo..." : "Excluir"}
           </DeleteButton>
         </ButtonRow>

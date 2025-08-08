@@ -7,7 +7,7 @@ export const getMateriais = async() => {
     } catch (error) {
         let message = "Erro inesperado";
 
-        return { error: message };
+        throw new Error(message);
     }
 };
 
@@ -20,6 +20,6 @@ export const searchPostByMaterial = async(materiais: number[]) => {
     } catch (error) {
         let message = "Erro inesperado";
 
-        return { error: message };
+        throw new Error(message);
     }
 };

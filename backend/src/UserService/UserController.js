@@ -38,16 +38,20 @@ module.exports = {
 
     //Deletando usuário;
     async erase(req, res){
-        const { userId } = req;
-
-        const user = await User.findByPk(userId);
-
-        if(!user) {
-            return res.status(400).json({ error: 'Usuário não achado' });
+        try {
+            const { userId } = req;
+    
+            const user = await User.findByPk(userId);
+    
+            if(!user) {
+                return res.status(400).json({ error: 'Usuário não achado' });
+            }
+    
+            await user.destroy();
+    
+            return res.status(204).send();
+        } catch (error) {
+            throw error;
         }
-
-        await user.destroy();
-
-        return res.status(204).send();
     },
 }
