@@ -221,6 +221,9 @@ module.exports = {
             const posts = await Post.findAll({
                 order: [['created_at', 'DESC']],
                 include: [{
+                    model: User,
+                    as: 'user'
+                }, {
                     model: Comment,
                     as: 'comments'
                 }, {

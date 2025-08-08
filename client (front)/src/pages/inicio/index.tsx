@@ -152,8 +152,8 @@ export default function TelaInicial() {
               postagens.map((postagem, index) => (
                 <div key={index}>
                   <Postagem
-                    userPhoto={user.photo || "/img/default.jpg"}
-                    userName={user.name}
+                    userPhoto={postagem.user.photo || "/img/default.jpg"}
+                    userName={postagem.user.name}
                     dateTime={formatDate(postagem.created_at)}
                     projectTitle={postagem.title}
                     projectDescription={postagem.description}
