@@ -1,0 +1,18 @@
+# Ignora node_modules para evitar enviar para a imagem
+node_modules
+
+# Ignora pastas de build/transpile
+dist
+build
+
+# Ignora arquivos de logs
+*.log
+
+# Ignora arquivos temporários do sistema
+*.swp
+*.tmp
+*.DS_Store
+
+# Ignora arquivos de ambiente locais que não devem ir para o container
+.env
+.env.local

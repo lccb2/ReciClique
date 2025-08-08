@@ -1,0 +1,51 @@
+
+
+services:
+  aut-service:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.aut-service
+    ports:
+      - "3001:3001"
+
+  post-service:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.post-service
+    ports:
+      - "3002:3002"
+
+  user-service:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.user-service
+    ports:
+      - "3003:3003"
+
+  coment-service:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.coment-service
+    ports:
+      - "3004:3004"
+
+  pag-service:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.pag-service
+    ports:
+      - "3005:3005"
+  
+  pesq-service:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.pesq-service
+    ports:
+      - "3006:3006"
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"

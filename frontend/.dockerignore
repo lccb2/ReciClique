@@ -1,0 +1,16 @@
+# Ignora node_modules
+node_modules
+
+# Ignora builds locais, pastas geradas após build (exemplo: build, dist)
+build
+dist
+
+# Ignora arquivos temporários e sistema
+*.log
+*.swp
+*.tmp
+*.DS_Store
+
+# Ignora arquivos de ambiente que não devem ir para o container
+.env
+.env.local
