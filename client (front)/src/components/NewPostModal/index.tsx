@@ -20,6 +20,7 @@ import MaterialSelector from "../MaterialSelector";
 import ConfirmPost from "../ConfirmPostModal";
 import { createPost } from "api/post";
 import { getMateriais } from "api/pesq";
+import toast from "react-hot-toast";
 
 interface Props {
   isOpen: boolean;
@@ -35,6 +36,7 @@ const NewPostModal: React.FC<Props> = ({ isOpen, onClose, onPostCreated }) => {
   );
   const [tutorial, setTutorial] = useState("");
   const [imagens, setImagens] = useState<File[]>([]);
+  const [loading, setLoading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const [showConfirmPost, setShowConfirmPost] = useState(false);
   const [materiais, setMateriais] = useState<any[]>([]);
@@ -64,15 +66,23 @@ const NewPostModal: React.FC<Props> = ({ isOpen, onClose, onPostCreated }) => {
   };
 
   const handleSubmit = async () => {
-    if (
-      !titulo.trim() ||
-      !descricao.trim() ||
-      materiaisSelecionados.length === 0
-    ) {
-      alert("Preencha os campos obrigatórios (*)");
+    // Validation
+    if (!titulo.trim()) {
+      toast.error("Título é obrigatório");
       return;
     }
 
+    if (!descricao.trim()) {
+      toast.error("Descrição é obrigatória");
+      return;
+    }
+
+    if (materiaisSelecionados.length === 0) {
+      toast.error("Selecione pelo menos um material");
+      return;
+    }
+
+    setLoading(true);
     try {
       await createPost({
         title: titulo,
@@ -89,6 +99,8 @@ const NewPostModal: React.FC<Props> = ({ isOpen, onClose, onPostCreated }) => {
       setTutorial("");
       setImagens([]);
 
+      toast.success("Postagem criada com sucesso!");
+
       if (onPostCreated) {
         onPostCreated();
       }
@@ -99,6 +111,9 @@ const NewPostModal: React.FC<Props> = ({ isOpen, onClose, onPostCreated }) => {
       }, 1000);
     } catch (error) {
       console.log(error, "error");
+      toast.error("Erro ao criar postagem. Tente novamente.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -206,10 +221,12 @@ const NewPostModal: React.FC<Props> = ({ isOpen, onClose, onPostCreated }) => {
                 </InputWrapper>
 
                 <ButtonsContainer>
-                  <Button cancel onClick={onClose}>
+                  <Button cancel onClick={onClose} disabled={loading}>
                     Cancelar
                   </Button>
-                  <Button onClick={handleSubmit}>Adicionar</Button>
+                  <Button onClick={handleSubmit} disabled={loading}>
+                    {loading ? "Criando..." : "Adicionar"}
+                  </Button>
                 </ButtonsContainer>
               </>
             )}

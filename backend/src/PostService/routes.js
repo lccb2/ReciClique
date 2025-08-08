@@ -2,7 +2,7 @@ const express = require('express');
 const PostController = require('./PostController');
 const loginRequired = require('../middlewares/loginRequired');
 const multer = require('multer');
-const upload = multer({ dest: 'uploads/' });
+const upload = multer({ storage: multer.memoryStorage() });
 
 const routes = express.Router();
 

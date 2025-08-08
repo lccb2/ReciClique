@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   ModalOverlay,
   ModalBox,
@@ -6,16 +6,22 @@ import {
   Text,
   ButtonRow,
   CancelButton,
-  DeleteButton
-} from './style';
+  DeleteButton,
+} from "./style";
 
 interface Props {
   isOpen: boolean;
   onCancel: () => void;
   onConfirmDelete: () => void;
+  loading?: boolean;
 }
 
-const DeleteAccountModal: React.FC<Props> = ({ isOpen, onCancel, onConfirmDelete }) => {
+const DeleteAccountModal: React.FC<Props> = ({
+  isOpen,
+  onCancel,
+  onConfirmDelete,
+  loading = false,
+}) => {
   if (!isOpen) return null;
 
   return (
@@ -23,11 +29,16 @@ const DeleteAccountModal: React.FC<Props> = ({ isOpen, onCancel, onConfirmDelete
       <ModalBox onClick={(e) => e.stopPropagation()}>
         <Title>Tem certeza que deseja apagar sua conta?</Title>
         <Text>
-          Essa ação é <strong>irreversível</strong> e todos os seus dados serão perdidos.
+          Essa ação é <strong>irreversível</strong> e todos os seus dados serão
+          perdidos.
         </Text>
         <ButtonRow>
-          <CancelButton onClick={onCancel}>Cancelar</CancelButton>
-          <DeleteButton onClick={onConfirmDelete}>Apagar Conta</DeleteButton>
+          <CancelButton onClick={onCancel} disabled={loading}>
+            Cancelar
+          </CancelButton>
+          <DeleteButton onClick={onConfirmDelete} disabled={loading}>
+            {loading ? "Apagando..." : "Apagar Conta"}
+          </DeleteButton>
         </ButtonRow>
       </ModalBox>
     </ModalOverlay>

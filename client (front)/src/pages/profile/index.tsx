@@ -1,26 +1,40 @@
-import { useState, useEffect } from 'react';
-import Image from 'next/image';
-import { Container, MainContent, Header, Form, Row, Title, Divisor, Description } from './style';
-import { SideBar } from '../../components';
-import { CoverBg, Logo } from '../../assets';
-import DeleteAccountModal from '../../components/DeleteAccountModal';
-import { deleteUser, getUser, updateUser } from 'api/user';
-import { useRouter } from 'next/router';
+import { useState, useEffect } from "react";
+import Image from "next/image";
+import {
+  Container,
+  MainContent,
+  Header,
+  Form,
+  Row,
+  Title,
+  Divisor,
+  Description,
+} from "./style";
+import { SideBar } from "../../components";
+import { CoverBg, Logo } from "../../assets";
+import DeleteAccountModal from "../../components/DeleteAccountModal";
+import { deleteUser, getUser, updateUser } from "api/user";
+import { useRouter } from "next/router";
+import toast from "react-hot-toast";
 
 export default function Profile() {
   const router = useRouter();
 
   // estados para controlar os campos do form
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
-  const [instagram, setInstagram] = useState('');
-  const [greeting, setGreeting] = useState('');
-  const [photo, setPhoto] = useState('');
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [instagram, setInstagram] = useState("");
+  const [greeting, setGreeting] = useState("");
+  const [photo, setPhoto] = useState("");
   const [showEmail, setShowEmail] = useState(false);
   const [showPhone, setShowPhone] = useState(false);
   const [showInsta, setShowInsta] = useState(false);
   const [user, setUser] = useState<any | null>(null);
+
+  // estados para controlar loading
+  const [loading, setLoading] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   // estado para controlar o modal
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -32,20 +46,25 @@ export default function Profile() {
   const closeDeleteModal = () => setIsDeleteModalOpen(false);
 
   // confirmar exclusão
-  const handleConfirmDelete = async() => {
+  const handleConfirmDelete = async () => {
+    setDeleteLoading(true);
     try {
       await deleteUser();
-      localStorage.removeItem('user_id');
-      localStorage.removeItem('token');
-      router.push('/')
+      localStorage.removeItem("user_id");
+      localStorage.removeItem("token");
+      toast.success("Conta excluída com sucesso!");
+      router.push("/");
     } catch (error) {
-      console.log(error, 'error');
+      console.log(error, "error");
+      toast.error("Erro ao excluir conta. Tente novamente.");
+    } finally {
+      setDeleteLoading(false);
     }
   };
 
-  const fetchUser = async() => {
+  const fetchUser = async () => {
     try {
-      const userId = Number(localStorage.getItem('user_id'));
+      const userId = Number(localStorage.getItem("user_id"));
       const user = await getUser(userId);
 
       setName(user.name);
@@ -60,7 +79,8 @@ export default function Profile() {
 
       setUser(user as any);
     } catch (error) {
-      console.log(error, 'error')
+      console.log(error, "error");
+      toast.error("Erro ao carregar dados do usuário.");
     }
   };
 
@@ -68,23 +88,52 @@ export default function Profile() {
     fetchUser();
   }, []);
 
-  const handleSave = async(e: { preventDefault: () => void }) => {
+  const handleSave = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
 
+    if (!name.trim()) {
+      toast.error("Nome é obrigatório");
+      return;
+    }
+
+    if (!email.trim()) {
+      toast.error("E-mail é obrigatório");
+      return;
+    }
+
+    if (!phone.trim()) {
+      toast.error("Telefone é obrigatório");
+      return;
+    }
+
+    setLoading(true);
     try {
-      const profileData = { name, email, phone, instagram, greeting, show_email: showEmail, show_phone: showPhone, show_insta: showInsta };
+      const profileData = {
+        name,
+        email,
+        phone,
+        instagram,
+        greeting,
+        show_email: showEmail,
+        show_phone: showPhone,
+        show_insta: showInsta,
+      };
 
       await updateUser(profileData);
 
       await fetchUser();
+      toast.success("Perfil atualizado com sucesso!");
     } catch (error) {
-      console.log(error, 'error');
+      console.log(error, "error");
+      toast.error("Erro ao atualizar perfil. Tente novamente.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <>
-      { user &&
+      {user && (
         <Container>
           <SideBar />
           <MainContent>
@@ -102,7 +151,9 @@ export default function Profile() {
             <Form onSubmit={handleSave}>
               <Row>
                 <label>
-                  <span><span style={{ color: 'red' }}>*</span> Nome de Usuário</span>
+                  <span>
+                    <span style={{ color: "red" }}>*</span> Nome de Usuário
+                  </span>
                   <input
                     placeholder="Digite o nome de usuário"
                     value={name}
@@ -111,7 +162,9 @@ export default function Profile() {
                   />
                 </label>
                 <label>
-                  <span><span style={{ color: 'red' }}>*</span> E-mail </span>
+                  <span>
+                    <span style={{ color: "red" }}>*</span> E-mail{" "}
+                  </span>
                   <input
                     type="Email"
                     placeholder="Digite o seu e-mail"
@@ -120,12 +173,19 @@ export default function Profile() {
                     required
                   />
                   <div>
-                    <input type="checkbox" id="showEmail" checked={showEmail} onChange={(e) => setShowEmail(e.target.checked)} />
+                    <input
+                      type="checkbox"
+                      id="showEmail"
+                      checked={showEmail}
+                      onChange={(e) => setShowEmail(e.target.checked)}
+                    />
                     <span>Desejo mostrar no meu perfil</span>
                   </div>
                 </label>
                 <label>
-                  <span><span style={{ color: 'red' }}>*</span> Telefone </span>
+                  <span>
+                    <span style={{ color: "red" }}>*</span> Telefone{" "}
+                  </span>
                   <input
                     placeholder="Digite o seu telefone"
                     value={phone}
@@ -133,7 +193,12 @@ export default function Profile() {
                     required
                   />
                   <div>
-                    <input type="checkbox" id="showPhone" checked={showPhone} onChange={(e) => setShowPhone(e.target.checked)} />
+                    <input
+                      type="checkbox"
+                      id="showPhone"
+                      checked={showPhone}
+                      onChange={(e) => setShowPhone(e.target.checked)}
+                    />
                     <span>Desejo mostrar no meu perfil</span>
                   </div>
                 </label>
@@ -145,14 +210,17 @@ export default function Profile() {
                     onChange={(e) => setInstagram(e.target.value)}
                   />
                   <div>
-                    <input type="checkbox" id="showInstagram" checked={showInsta} onChange={(e) => setShowInsta(e.target.checked)} />
+                    <input
+                      type="checkbox"
+                      id="showInstagram"
+                      checked={showInsta}
+                      onChange={(e) => setShowInsta(e.target.checked)}
+                    />
                     <span>Desejo mostrar no meu perfil</span>
                   </div>
                 </label>
               </Row>
-              <Description>
-                Mensagem de saudação
-              </Description>
+              <Description>Mensagem de saudação</Description>
               <textarea
                 placeholder="Insira uma breve saudação"
                 value={greeting}
@@ -163,10 +231,17 @@ export default function Profile() {
                   type="button"
                   className="delete"
                   onClick={openDeleteModal} // abre modal ao clicar
+                  disabled={loading || deleteLoading}
                 >
                   ✖ Apagar Conta
                 </button>
-                <button type="submit" className="save">✅ Salvar alterações</button>
+                <button
+                  type="submit"
+                  className="save"
+                  disabled={loading || deleteLoading}
+                >
+                  {loading ? "Salvando..." : "✅ Salvar alterações"}
+                </button>
               </div>
             </Form>
 
@@ -175,10 +250,11 @@ export default function Profile() {
               isOpen={isDeleteModalOpen}
               onCancel={closeDeleteModal}
               onConfirmDelete={handleConfirmDelete}
+              loading={deleteLoading}
             />
           </MainContent>
         </Container>
-      }
+      )}
     </>
   );
 }

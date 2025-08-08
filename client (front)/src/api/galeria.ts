@@ -6,6 +6,8 @@ export const getGaleria = async(userId: number) => {
 
         return response.data;
     } catch (error) {
-        console.log(error, 'error');
+        let message = "Erro inesperado";
+
+        return { error: message };
     }
 }

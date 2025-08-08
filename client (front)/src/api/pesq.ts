@@ -5,7 +5,9 @@ export const getMateriais = async() => {
         const response = await api.get('/pesq/materiais');
         return response.data;
     } catch (error) {
-        console.log(error, 'error')
+        let message = "Erro inesperado";
+
+        return { error: message };
     }
 };
 
@@ -16,6 +18,8 @@ export const searchPostByMaterial = async(materiais: number[]) => {
         });
         return response.data;
     } catch (error) {
-        console.log(error, 'error')
+        let message = "Erro inesperado";
+
+        return { error: message };
     }
 };

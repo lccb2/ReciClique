@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from "react";
 import {
   Container,
   LeftSide,
@@ -12,39 +12,60 @@ import {
   Label,
   ForgotPassword,
   InputContainer,
-  Field
-} from './style';
-import { useRouter } from 'next/router';
-import Image from 'next/image';
-import { SideBg } from '../../assets';
-import { Register } from 'pages/register';
-import { login } from 'api/aut';
+  Field,
+} from "./style";
+import { useRouter } from "next/router";
+import Image from "next/image";
+import { SideBg } from "../../assets";
+import { Register } from "pages/register";
+import { login } from "api/aut";
+import toast from "react-hot-toast";
 
 export default function Login() {
   const router = useRouter();
   const [isRegistering, setIsRegistering] = useState(false);
-  const [form, setForm] = useState({ name: '', email: '', password: '', remember: true });
+  const [loading, setLoading] = useState(false);
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    password: "",
+    remember: true,
+  });
 
   const isFormValid = () => {
     if (isRegistering) return form.name && form.email && form.password;
     return form.email && form.password;
   };
 
-  const handleLogin = async() => {
-    if (isFormValid()) {
-      try {
-        const response = await login(form);
+  const handleLogin = async () => {
+    if (!form.email.trim()) {
+      toast.error("E-mail é obrigatório");
+      return;
+    }
 
-        localStorage.setItem('token', response.token);
-        localStorage.setItem('user_id', response.id);
+    if (!form.password.trim()) {
+      toast.error("Senha é obrigatória");
+      return;
+    }
 
-        router.push('/profile');
-      } catch (error) {
-        console.log(error);
-      }
+    setLoading(true);
+    try {
+      const response = await login(form);
+
+      console.log(response, 'response');
+
+      localStorage.setItem("token", response.token);
+      localStorage.setItem("user_id", response.id);
+
+      toast.success("Login realizado com sucesso!");
+      router.push("/profile");
+    } catch (error) {
+      console.log(error);
+      toast.error("Erro ao realizar o login. Verifique suas credenciais.");
+    } finally {
+      setLoading(false);
     }
   };
-
 
   return (
     <Container>
@@ -52,56 +73,69 @@ export default function Login() {
         <Image src={SideBg} alt="Side background" fill />
       </LeftSide>
       <RightSide>
-      {isRegistering ? (
+        {isRegistering ? (
           <Register onBack={() => setIsRegistering(false)} />
         ) : (
-        <>
-        <Title>Reciclique</Title>
-        <Form>
-          <Field>
-          <h2>Entrar</h2>
-          <p>Insira as suas informações para acessar a plataforma.</p>
-          </Field>
-          <Field>
-           <label> Email </label>
-          <Input
-            type="email"
-            placeholder="Digite o seu e-mail"
-            value={form.email}
-            onChange={e => setForm({ ...form, email: e.target.value })}
-          />
-           </Field>
-           <Field>
-           <label> Senha </label>
-          <Input
-            type="password"
-            placeholder="Digite a sua senha"
-            value={form.password}
-            onChange={e => setForm({ ...form, password: e.target.value })}
-          />
-        </Field>
-          {!isRegistering && (
-            <InputContainer>
-              <CheckboxContainer>
-                <input
-                  type="checkbox"
-                  checked={form.remember}
-                  onChange={e => setForm({ ...form, remember: e.target.checked })}
+          <>
+            <Title>Reciclique</Title>
+            <Form>
+              <Field>
+                <h2>Entrar</h2>
+                <p>Insira as suas informações para acessar a plataforma.</p>
+              </Field>
+              <Field>
+                <label> Email </label>
+                <Input
+                  type="email"
+                  placeholder="Digite o seu e-mail"
+                  value={form.email}
+                  onChange={(e) => setForm({ ...form, email: e.target.value })}
+                  disabled={loading}
                 />
-                <Label>Lembrar de mim</Label>
-              </CheckboxContainer>
-              <ForgotPassword>Esqueceu a senha?</ForgotPassword>
-            </InputContainer>
-          )}
+              </Field>
+              <Field>
+                <label> Senha </label>
+                <Input
+                  type="password"
+                  placeholder="Digite a sua senha"
+                  value={form.password}
+                  onChange={(e) =>
+                    setForm({ ...form, password: e.target.value })
+                  }
+                  disabled={loading}
+                />
+              </Field>
+              {!isRegistering && (
+                <InputContainer>
+                  <CheckboxContainer>
+                    <input
+                      type="checkbox"
+                      checked={form.remember}
+                      onChange={(e) =>
+                        setForm({ ...form, remember: e.target.checked })
+                      }
+                      disabled={loading}
+                    />
+                    <Label>Lembrar de mim</Label>
+                  </CheckboxContainer>
+                  <ForgotPassword>Esqueceu a senha?</ForgotPassword>
+                </InputContainer>
+              )}
 
-          <Button  onClick={handleLogin} disabled={!isFormValid()}>
-            Entrar
-          </Button>
-          <SecondaryButton onClick={() => setIsRegistering(prev => !prev)}>
-             Realizar Cadastro
-          </SecondaryButton>
-        </Form>
-        </>
+              <Button
+                onClick={handleLogin}
+                disabled={loading || !isFormValid()}
+              >
+                {loading ? "Entrando..." : "Entrar"}
+              </Button>
+              <SecondaryButton
+                onClick={() => setIsRegistering((prev) => !prev)}
+                disabled={loading}
+              >
+                Realizar Cadastro
+              </SecondaryButton>
+            </Form>
+          </>
         )}
       </RightSide>
     </Container>

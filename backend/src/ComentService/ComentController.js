@@ -31,7 +31,7 @@ module.exports = {
             const comments = await Comment.findAll({
                 where: { post_id },
                 include: [{ model: User, as: 'user' }],
-                order: [['createdAt', 'DESC']]
+                order: [['created_at', 'DESC']]
             });
             return res.json(comments);
         } catch (error) {

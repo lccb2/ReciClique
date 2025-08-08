@@ -32,7 +32,6 @@ import OptionsModal from "../OptionsModal";
 import DeletePostModal from "../DeletePostModal";
 import EditPostModal from "../EditPostModal";
 import DefaultPhoto from "../../../public/img/default.jpg";
-import { baseURL } from "api/base";
 
 import {
   FaHeart,
@@ -108,12 +107,12 @@ export default function Postagem({
 
   const router = useRouter();
 
-  const [userId, setUserId] = useState(Number(localStorage.getItem("user_id")));
+  const [userId, setUserId] = useState(localStorage.getItem("user_id"));
 
   const [currentPost, setCurrentPost] = useState(post);
 
   const handleIsLiked = () => {
-    const userIdFromLocalStorage = Number(localStorage.getItem("user_id"));
+    const userIdFromLocalStorage = localStorage.getItem("user_id");
     setUserId(userIdFromLocalStorage);
     const isLikedByUser = post?.post_likes?.find(
       (like: any) => like.user_id === userIdFromLocalStorage
@@ -165,7 +164,7 @@ export default function Postagem({
     return list.filter((p): p is string => typeof p === "string" && !!p);
   }, [projectPhoto]);
 
-  const getProjectPhoto = (photo: string) => `${baseURL}/uploads/${photo}`;
+  const getProjectPhoto = (photo: string) => photo;
 
   const handlePrevImage = () => {
     setCurrentImageIndex(
@@ -303,9 +302,8 @@ export default function Postagem({
           {showCommentModal && (
             <NewCommentModal
               onClose={() => setShowCommentModal(false)}
-              onSubmit={(descricao) => {
-                handleCreateComment(post.id, descricao);
-                setShowCommentModal(false);
+              onSubmit={async (descricao) => {
+                await handleCreateComment(post.id, descricao);
               }}
               isOpen={true}
             />

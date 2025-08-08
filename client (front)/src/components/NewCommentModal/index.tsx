@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
+import toast from "react-hot-toast";
 import {
   Overlay,
   ModalContainer,
@@ -8,35 +9,54 @@ import {
   Label,
   RequiredMark,
   ButtonsContainer,
-  Button
-} from './style';
-
-
+  Button,
+} from "./style";
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (comentario: string) => void;
+  onSubmit: (comentario: string) => Promise<void>;
 }
 
 const CommentModal: React.FC<Props> = ({ isOpen, onClose, onSubmit }) => {
-  const [comentario, setComentario] = useState('');
+  const [comentario, setComentario] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!comentario.trim()) {
-      alert('O comentário não pode estar vazio.');
+      toast.error("O comentário não pode estar vazio.");
       return;
     }
 
-    onSubmit(comentario);
-    setComentario('');
-    onClose();
+    if (comentario.trim().length < 3) {
+      toast.error("O comentário deve ter pelo menos 3 caracteres.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await onSubmit(comentario);
+      toast.success("Comentário adicionado com sucesso!");
+      setComentario("");
+      onClose();
+    } catch (error) {
+      console.error("Erro ao adicionar comentário:", error);
+      toast.error("Erro ao adicionar comentário. Tente novamente.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleClose = () => {
+    if (!loading) {
+      onClose();
+    }
   };
 
   if (!isOpen) return null;
 
   return (
-    <Overlay onClick={onClose}>
+    <Overlay onClick={handleClose}>
       <ModalContainer onClick={(e) => e.stopPropagation()}>
         <ModalHeader>
           <img src="/img/plus.png" alt="+" width={20} height={20} />
@@ -52,12 +72,20 @@ const CommentModal: React.FC<Props> = ({ isOpen, onClose, onSubmit }) => {
             value={comentario}
             onChange={(e) => setComentario(e.target.value)}
             rows={4}
+            disabled={loading}
           />
         </InputWrapper>
 
         <ButtonsContainer>
-          <Button cancel onClick={onClose}>Cancelar</Button>
-          <Button onClick={handleSubmit}>Adicionar</Button>
+          <Button cancel onClick={handleClose} disabled={loading}>
+            Cancelar
+          </Button>
+          <Button
+            onClick={handleSubmit}
+            disabled={loading || !comentario.trim()}
+          >
+            {loading ? "Adicionando..." : "Adicionar"}
+          </Button>
         </ButtonsContainer>
       </ModalContainer>
     </Overlay>

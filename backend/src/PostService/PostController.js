@@ -4,118 +4,169 @@ const PostMaterial = require('../models/PostMaterial');
 const Materiais = require('../models/Materiais');
 const Comment = require('../models/Comment');
 const PostLike = require('../models/PostLike');
+const { createClient } = require('@supabase/supabase-js');
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
+const bucketName = 'imagens';
+
+async function uploadToSupabase(file, userId, index) {
+    const fileExt = file.originalname.split('.').pop();
+    const timestamp = Date.now();
+    const fileName = `posts/${userId}-${timestamp}-${index}.${fileExt}`;
+
+    const { data, error } = await supabase.storage
+        .from(bucketName)
+        .upload(fileName, file.buffer, {
+            contentType: file.mimetype,
+        });
+
+    if (error) {
+        console.error('Erro no upload para Supabase:', error);
+        return null;
+    }
+
+    const { data: signedUrlData, error: signedUrlError } = await supabase.storage
+        .from(bucketName)
+        .createSignedUrl(data.path, 60 * 60);
+
+    if (signedUrlError) {
+        console.error('Erro ao gerar signed URL:', signedUrlError);
+        return null;
+    }
+
+    return signedUrlData.signedUrl;
+}
 
 module.exports = {
-    //Criando nova publicação
-    async store(req, res){
+    async store(req, res) {
         try {
             const { userId } = req;
-            const { title, description, link } = req.body;
+            const { title, description, link, materiais } = req.body;
             const photos = req.files;
 
-            let photo;
-            let photo_2;
-            let photo_3;
-
             const user = await User.findByPk(userId);
+            if (!user) return res.status(400).json({ error: 'Usuário não achado' });
 
-            if(!user) {
-                return res.status(400).json({ error: 'Usuário não achado' });
-            }
+            let photo = null;
+            let photo_2 = null;
+            let photo_3 = null;
 
             if (photos?.length) {
-                photo = photos[0]?.filename || null;
-                photo_2 = photos[1]?.filename || null;
-                photo_3 = photos[2]?.filename || null;
+                photo = await uploadToSupabase(photos[0], userId, 1);
+                photo_2 = photos[1] ? await uploadToSupabase(photos[1], userId, 2) : null;
+                photo_3 = photos[2] ? await uploadToSupabase(photos[2], userId, 3) : null;
             }
 
-            const { materiais } = req.body;
+            const materiaisIds = Array.isArray(materiais) ? materiais : JSON.parse(materiais);
 
-            materiais.map(async material => {
-                const materialExiste = await Materiais.findByPk(Number(material));
-
-                if (!materialExiste) {
-                    return res.status(400).json({ error: "Material não achado" })
-                }
-            });
+            for (const materialId of materiaisIds) {
+                const exists = await Materiais.findByPk(Number(materialId));
+                if (!exists) return res.status(400).json({ error: 'Material não achado' });
+            }
 
             const post = await Post.create({
                 user_id: userId,
                 photo,
+                photo_2,
+                photo_3,
                 title,
                 description,
                 link,
                 likes: 0,
-                photo_2,
-                photo_3
             });
 
-            const postMateriais = materiais.map(material => {
-                return {
-                    post_id: post.id,
-                    material_id: material
-                }
-            });
+            const postMateriais = materiaisIds.map(materialId => ({
+                post_id: post.id,
+                material_id: materialId,
+            }));
 
             await PostMaterial.bulkCreate(postMateriais);
 
             return res.json(post);
         } catch (error) {
-            console.log(error);
-            throw error;
+            console.error(error);
+            return res.status(500).json({ error: 'Erro ao criar publicação' });
         }
     },
 
     //Mostrando publicação
     async show(req, res){
-        const { post_id } = req.params;
+        try {
+            const { post_id } = req.params;
 
-        const post = await Post.findOne({ 
-            where: {id: post_id},
-            include: [{
-                model: Comment,
-                as: 'comments'
-            }, {
-                model: PostMaterial,
-                as: 'post_materiais',
-                attributes: ['id', 'material_id'],
+            const post = await Post.findOne({ 
+                where: {id: post_id},
                 include: [{
-                    model: Materiais,
-                    as: 'material',
-                    attributes: ['id', 'name']
-                }]
-            }, {
-                model: PostLike,
-                as: 'post_likes'
-            }],
-            nest: true
-        });
+                    model: Comment,
+                    as: 'comments'
+                }, {
+                    model: PostMaterial,
+                    as: 'post_materiais',
+                    attributes: ['id', 'material_id'],
+                    include: [{
+                        model: Materiais,
+                        as: 'material',
+                        attributes: ['id', 'name']
+                    }]
+                }, {
+                    model: PostLike,
+                    as: 'post_likes'
+                }],
+                nest: true
+            });
 
-        if(!post) {
-            return res.status(400).json({ error: 'Publicação não achada' });
+            if(!post) {
+                return res.status(400).json({ error: 'Publicação não achada' });
+            }
+
+            return res.json(post);
+        } catch (error) {
+            console.error('Erro ao buscar publicação:', error);
+            return res.status(500).json({ error: 'Erro interno do servidor' });
         }
-
-        return res.json(post);
     },
 
-    //Deletando publicação;
     async erase(req, res){
-        const { post_id } = req.params;
-        const { userId } = req;
+        try {
+            const { post_id } = req.params;
+            const { userId } = req;
 
-        const post = await Post.findByPk(post_id);
+            const post = await Post.findByPk(post_id);
 
-        if(!post) {
-            return res.status(400).json({ error: 'Publicação não achada' });
+            if(!post) {
+                return res.status(400).json({ error: 'Publicação não achada' });
+            }
+
+            await PostMaterial.destroy({
+                where: {
+                    post_id: post_id
+                }
+            });
+
+            await PostLike.destroy({
+                where: {
+                    post_id: post_id
+                }
+            });
+
+            await Comment.destroy({
+                where: {
+                    post_id: post_id
+                }
+            });
+
+            if (post.user_id !== userId) {
+                return res.status(401).json({ error: 'Publicação não pertence ao usuário logado!' });
+            }
+
+            await post.destroy();
+
+            return res.status(200).json({ message: 'Publicação deletada com sucesso' });
+        } catch (error) {
+            console.error('Erro ao deletar publicação:', error);
+            return res.status(500).json({ error: 'Erro interno do servidor' });
         }
-
-        if (post.user_id !== userId) {
-            return res.status(401).json({ error: 'Publicação não pertence ao usuário logado!' });
-        }
-
-        await post.destroy();
-
-        return res.status(204).send();
     },
 
     //Atualiza informações do post;
@@ -129,7 +180,6 @@ module.exports = {
             if(!post) {
                 return res.status(400).json({ error: 'Post não achado' });
             }
-
 
             for (const material of materiais) {
                 const materialExiste = await Materiais.findByPk(material);
@@ -197,30 +247,35 @@ module.exports = {
     },
 
     async userPosts(req, res){
-        const { user_id } = req.params;
+        try {
+            const { user_id } = req.params;
 
-        const posts = await Post.findAll({
-            where: { user_id },
-            order: [['created_at', 'DESC']],
-            include: [{
-                model: Comment,
-                as: 'comments'
-            }, {
-                model: PostMaterial,
-                as: 'post_materiais',
-                attributes: ['id', 'material_id'],
+            const posts = await Post.findAll({
+                where: { user_id },
+                order: [['created_at', 'DESC']],
                 include: [{
-                    model: Materiais,
-                    as: 'material',
-                    attributes: ['id', 'name']
-                }]
-            }, {
-                model: PostLike,
-                as: 'post_likes'
-            }],
-            nest: true
-        });
+                    model: Comment,
+                    as: 'comments'
+                }, {
+                    model: PostMaterial,
+                    as: 'post_materiais',
+                    attributes: ['id', 'material_id'],
+                    include: [{
+                        model: Materiais,
+                        as: 'material',
+                        attributes: ['id', 'name']
+                    }]
+                }, {
+                    model: PostLike,
+                    as: 'post_likes'
+                }],
+                nest: true
+            });
 
-        return res.status(200).json(posts);
+            return res.status(200).json(posts);
+        } catch (error) {
+            console.error('Erro ao listar posts do usuário:', error);
+            return res.status(500).json({ message: 'Erro interno do servidor' });
+        }
     }
 };

@@ -1,10 +1,10 @@
-import styled from 'styled-components';
+import styled from "styled-components";
 
 export const Container = styled.div`
   display: flex;
   height: 100vh;
-  font-family: 'Montserrat', sans-serif;
-  background-color: #FFF;
+  font-family: "Montserrat", sans-serif;
+  background-color: #fff;
 `;
 
 export const LeftSide = styled.div`
@@ -14,7 +14,7 @@ export const LeftSide = styled.div`
   overflow: hidden;
   border-top-right-radius: 1rem;
   border-bottom-right-radius: 1rem;
-    `;
+`;
 
 export const Cadastro = styled.div`
   width: 50%;
@@ -23,7 +23,7 @@ export const Cadastro = styled.div`
   overflow: hidden;
   border-top-right-radius: 1rem;
   border-bottom-right-radius: 1rem;
-    `;
+`;
 
 export const RightSide = styled.div`
   width: 50%;
@@ -36,7 +36,7 @@ export const RightSide = styled.div`
 `;
 
 export const Title = styled.h1`
-  color: #4C3127;
+  color: #4c3127;
   font-family: "Amatic SC";
   font-size: 3.62831rem;
   font-style: normal;
@@ -51,7 +51,7 @@ export const Form = styled.div`
   gap: 1rem;
 
   h2 {
-    color: #484C52;
+    color: #484c52;
     font-family: Montserrat;
     font-size: 1.25rem;
     font-style: normal;
@@ -66,28 +66,30 @@ export const Form = styled.div`
     font-size: 0.875rem;
     font-style: normal;
     font-weight: 400;
-    line-height: 1.3125rem; 
+    line-height: 1.3125rem;
   }
-  label{
+  label {
     color: #000;
-  font-family: Montserrat;
-  font-size: 0.875rem;
-  font-style: normal;
-  font-weight: 500;
-  line-height: normal;
+    font-family: Montserrat;
+    font-size: 0.875rem;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
   }
 `;
 
-export const Input = styled.input`
+export const Input = styled.input<{ disabled?: boolean }>`
   padding: 0.75rem;
   height: 2.5rem;
   font-size: 1rem;
   border-radius: 8px;
-  border: 1px solid #D3D3D3;
+  border: 1px solid #d3d3d3;
   outline: none;
+  background-color: ${({ disabled }) => (disabled ? "#f5f5f5" : "#fff")};
+  cursor: ${({ disabled }) => (disabled ? "not-allowed" : "text")};
 
   &:focus {
-    border-color: #A4B78C;
+    border-color: #a4b78c;
   }
 `;
 
@@ -100,11 +102,11 @@ export const Field = styled.div`
 export const Button = styled.button<{ disabled?: boolean }>`
   padding: 0.625rem;
   font-size: 1rem;
-  background-color: ${({ disabled }) => (disabled ? '#808080' : '#A0B78A')};
+  background-color: ${({ disabled }) => (disabled ? "#808080" : "#A0B78A")};
   border: none;
   border-radius: 8px;
-  cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
-  color: #FFF;
+  cursor: ${({ disabled }) => (disabled ? "not-allowed" : "pointer")};
+  color: #fff;
   font-family: Montserrat;
   font-size: 1rem;
   font-style: normal;
@@ -112,14 +114,14 @@ export const Button = styled.button<{ disabled?: boolean }>`
   line-height: normal;
 `;
 
-export const SecondaryButton = styled.button`
+export const SecondaryButton = styled.button<{ disabled?: boolean }>`
   padding: 0.625rem;
   font-size: 1rem;
-  border: 1.5px solid #A0B78A;
-  color: #A0B78A;
+  border: 1.5px solid ${({ disabled }) => (disabled ? "#ccc" : "#a0b78a")};
+  color: ${({ disabled }) => (disabled ? "#ccc" : "#a0b78a")};
   border-radius: 8px;
   background-color: transparent;
-  cursor: pointer;
+  cursor: ${({ disabled }) => (disabled ? "not-allowed" : "pointer")};
   font-family: Montserrat;
   font-size: 1rem;
   font-style: normal;
@@ -139,7 +141,7 @@ export const Label = styled.label`
   font-size: 0.75rem;
   font-style: normal;
   font-weight: 400;
-  line-height: 1.3125rem; 
+  line-height: 1.3125rem;
 `;
 
 export const ForgotPassword = styled.a`
@@ -153,4 +155,58 @@ export const InputContainer = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+`;
+
+export const ImageDropzone = styled.label`
+  border: 2px dashed #ccc;
+  border-radius: 10px;
+  padding: 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.3s;
+  font-family: "Montserrat", sans-serif;
+
+  &:hover {
+    border-color: #a0b78a;
+  }
+`;
+
+export const DropText = styled.p`
+  font-size: 0.95rem;
+  color: #666;
+  margin: 0;
+`;
+
+export const PreviewContainer = styled.div`
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+`;
+
+export const PreviewImage = styled.img`
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1.5px solid #ccc;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+`;
+
+export const RemoveButton = styled.button<{ disabled?: boolean }>`
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: white;
+  color: ${({ disabled }) => (disabled ? "#ccc" : "#444")};
+  border: 1px solid ${({ disabled }) => (disabled ? "#ccc" : "#ccc")};
+  border-radius: 50%;
+  cursor: ${({ disabled }) => (disabled ? "not-allowed" : "pointer")};
+  font-size: 14px;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
 `;

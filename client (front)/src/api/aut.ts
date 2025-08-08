@@ -35,7 +35,12 @@ export const register = async(data: RegisterData) => {
 
     return response;
   } catch (error) {
-    throw error;
+    let message = "Erro inesperado";
+    if (axios.isAxiosError(error)) {
+      message = error.response?.data?.message || "Email ou senha inválidos";
+    }
+
+    return { error: message };
   }
 };
 
@@ -52,6 +57,11 @@ export const login = async(data: LoginData) => {
 
     return response.data;
   } catch (error) {
-    throw error;
+    let message = "Erro inesperado";
+    if (axios.isAxiosError(error)) {
+      message = error.response?.data?.message || "Email ou senha inválidos";
+    }
+
+    return { error: message };
   }
 }

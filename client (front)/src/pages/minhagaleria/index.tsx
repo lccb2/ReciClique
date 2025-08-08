@@ -16,6 +16,7 @@ import { FaInstagram, FaWhatsapp } from "react-icons/fa";
 import { getGaleria } from "api/galeria";
 import { getUser } from "api/user";
 import { deletePost } from "api/post";
+import toast from "react-hot-toast";
 
 export default function MinhaGaleria() {
   const [user, setUser] = useState<any | null>(null);
@@ -46,10 +47,11 @@ export default function MinhaGaleria() {
   const handleDeletePost = async (postId: number) => {
     try {
       await deletePost(postId);
+      toast.success("Postagem deletada com sucesso");
 
       fetchGaleria();
     } catch (error) {
-      console.log(error, "error");
+      toast.error("Erro ao deletar postagem");
     }
   };
 
@@ -58,8 +60,9 @@ export default function MinhaGaleria() {
       const userId = Number(localStorage.getItem("user_id"));
       const updatedGaleria = await getGaleria(userId);
       setGaleria(updatedGaleria as any);
+      toast.success("Like atualizado com sucesso");
     } catch (error) {
-      console.log(error, "error");
+      toast.error("Erro ao atualizar like");
     }
   };
 
@@ -69,8 +72,20 @@ export default function MinhaGaleria() {
       const updatedGaleria = await getGaleria(userId);
       setGaleria(updatedGaleria as any);
     } catch (error) {
-      console.log(error, "error");
+      toast.error("Erro ao atualizar comentário");
     }
+  };
+
+  const formatDate = (dateString: string): string => {
+    const date = new Date(dateString);
+
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear();
+
+    return `${day}/${month}/${year} às ${hours}:${minutes}`;
   };
 
   useEffect(() => {
@@ -125,7 +140,7 @@ export default function MinhaGaleria() {
                     <GalleryCard
                       userPhoto={user.photo}
                       userName={user.name}
-                      dateTime={post.created_at}
+                      dateTime={formatDate(post.created_at)}
                       projectTitle={post.title}
                       projectDescription={post.description}
                       materials={post.post_materiais
@@ -139,9 +154,9 @@ export default function MinhaGaleria() {
                         (like: any) => like.user_id === user.id
                       )}
                       disliked={false}
-                      likes={10}
+                      likes={post.post_likes?.length || 0}
                       dislikes={2}
-                      comments={post.comments}
+                      comments={post.comments || []}
                       post={post}
                       currentIndex={0}
                       onNavigate={() => {}}

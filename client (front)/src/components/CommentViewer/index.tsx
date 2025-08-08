@@ -13,12 +13,23 @@ import {
   IconsRow,
 } from './style';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
-import { baseURL } from 'api/base';
 
 type Props = {
   comments: any[];
   currentIndex: number;
   onNavigate: (newIndex: number) => void;
+};
+
+// Function to format date to HH:mm dd/MM/YYYY
+const formatDate = (dateString: string): string => {
+  const date = new Date(dateString);
+  const hours = date.getHours().toString().padStart(2, '0');
+  const minutes = date.getMinutes().toString().padStart(2, '0');
+  const day = date.getDate().toString().padStart(2, '0');
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');
+  const year = date.getFullYear();
+
+  return `${day}/${month}/${year} às ${hours}:${minutes}`;
 };
 
 export default function CommentViewer({
@@ -35,10 +46,10 @@ export default function CommentViewer({
   return (
     <CommentBox>
       <Header>
-        <Avatar src={`${baseURL}/uploads/${comment.user.photo}`} alt="Avatar" />
+        <Avatar src={comment.user.photo} alt="Avatar" />
         <NameDate>
-          <Name>{comment.userName}</Name>
-          <DateText>{comment.dateTime}</DateText>
+          <Name>{comment.user.name}</Name>
+          <DateText>{formatDate(comment.created_at)}</DateText>
         </NameDate>
       </Header>
 

@@ -11,12 +11,14 @@ import { Comment } from "../../types/comment";
 import { getRecentPosts } from "api/post";
 import { getUser } from "api/user";
 import { searchPostByMaterial } from "api/pesq";
+import toast from "react-hot-toast";
 
 export default function TelaInicial() {
   const [user, setUser] = useState<any | null>(null);
   const [postagens, setPostagens] = useState<any[]>([]);
   const [showPostModal, setShowPostModal] = useState(false);
   const [selectedMateriais, setSelectedMateriais] = useState<number[]>([]);
+  const [loading, setLoading] = useState(false);
 
   const fetchUser = async () => {
     try {
@@ -63,47 +65,38 @@ export default function TelaInicial() {
     try {
       const response = await searchPostByMaterial(materiais);
 
-      console.log(response, "response");
       setPostagens([...response]);
     } catch (error) {
       console.log(error, "error");
     }
   };
 
-  const handleNovaPostagem = (
-    titulo: string,
-    descricao: string,
-    materiais: string,
-    tutorial?: string
-  ) => {
-    const novaPostagem = {
-      titulo,
-      descricao,
-      materiais,
-      tutorial,
-      imagens: [],
-      usuario: "Você",
-      data: new Date().toISOString(),
-    };
+  const handleOpenPostModal = () => {
+    if (!user) {
+      toast.error("Usuário não autenticado. Faça login novamente.");
+      return;
+    }
 
-    setPostagens((prev) => [novaPostagem, ...prev]);
+    setLoading(true);
+    try {
+      setShowPostModal(true);
+    } catch (error) {
+      toast.error("Erro ao abrir modal de nova postagem.");
+    } finally {
+      setLoading(false);
+    }
   };
-  {
-    /* Mock de comentários para a postagem */
-  }
-  const comentariosMock: Comment[] = [
-    {
-      id: 1,
-      userPhoto: "/img/ProfileIcon.png",
-      userName: "Caio",
-      dateTime: "17/07/2025 ás 15:00",
-      text: "Lindo Lo! Tu arrasa!",
-      likes: 3,
-      dislikes: 0,
-      liked: false,
-      disliked: false,
-    },
-  ];
+
+  const formatDate = (dateString: string): string => {
+    const date = new Date(dateString);
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear();
+
+    return `${day}/${month}/${year} às ${hours}:${minutes}`;
+  };
 
   return (
     <>
@@ -128,9 +121,10 @@ export default function TelaInicial() {
 
               <button
                 className="postagem"
-                onClick={() => setShowPostModal(true)}
+                onClick={handleOpenPostModal}
+                disabled={loading}
               >
-                + Nova Postagem
+                {loading ? "Carregando..." : "+ Nova Postagem"}
               </button>
             </TopBar>
 
@@ -160,7 +154,7 @@ export default function TelaInicial() {
                   <Postagem
                     userPhoto={user.photo || "/img/default.jpg"}
                     userName={user.name}
-                    dateTime={postagem.created_at}
+                    dateTime={formatDate(postagem.created_at)}
                     projectTitle={postagem.title}
                     projectDescription={postagem.description}
                     materials={postagem.post_materiais
@@ -176,9 +170,9 @@ export default function TelaInicial() {
                       (like: any) => like.user_id === user.id
                     )}
                     disliked={false}
-                    likes={10}
-                    dislikes={2}
-                    comments={postagem.comments}
+                    likes={postagem.post_likes?.length || 0}
+                    dislikes={0}
+                    comments={postagem.comments || []}
                     post={postagem}
                     currentIndex={index}
                     onNavigate={() => {}}
